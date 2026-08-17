@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Hombros / cuerpo -->
+    <path android:fillColor="#3AA6D6" android:pathData="M34,74 L74,74 Q80,74 80,80 L80,92 L28,92 L28,80 Q28,74 34,74 Z"/>
+    <path android:fillColor="#2E86B5" android:pathData="M48,76 L60,76 L60,86 L48,86 Z"/>
+    <!-- Orejas -->
+    <path android:fillColor="#FFCB9A" android:pathData="M34,50 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
+    <path android:fillColor="#FFCB9A" android:pathData="M66,50 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
+    <!-- Cabeza -->
+    <path android:fillColor="#FFCB9A" android:pathData="M36,49 a18,18 0 1,0 36,0 a18,18 0 1,0 -36,0 Z"/>
+    <!-- Casco de ingeniero -->
+    <path android:fillColor="#F6A623" android:pathData="M37,41 A17,15 0 0,1 71,41 L71,43 L37,43 Z"/>
+    <path android:fillColor="#E0791A" android:pathData="M28,39 L80,39 Q84,39 84,43 Q84,47 80,47 L28,47 Q24,47 24,43 Q24,39 28,39 Z"/>
+    <path android:fillColor="#FFD9A0" android:pathData="M50,41 a4,3 0 1,0 8,0 a4,3 0 1,0 -8,0 Z"/>
+    <!-- Ojos y sonrisa -->
+    <path android:fillColor="#2A2A2A" android:pathData="M46,53 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z"/>
+    <path android:fillColor="#2A2A2A" android:pathData="M57,53 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z"/>
+    <path android:fillColor="#B5654A" android:pathData="M47,61 Q54,67 61,61 Q54,65 47,61 Z"/>
+    <!-- Mejillas -->
+    <path android:fillColor="#33FFA487" android:pathData="M41,57 a3,2.2 0 1,0 6,0 a3,2.2 0 1,0 -6,0 Z"/>
+    <path android:fillColor="#33FFA487" android:pathData="M61,57 a3,2.2 0 1,0 6,0 a3,2.2 0 1,0 -6,0 Z"/>
+</vector>

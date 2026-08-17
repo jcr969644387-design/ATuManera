@@ -103,6 +103,9 @@ interface PlacedInfrastructureDao {
     @Query("DELETE FROM placed_infrastructure WHERE cityId = :cityId AND tileId = :tileId")
     suspend fun removeAt(cityId: Long, tileId: Long)
 
+    @Query("DELETE FROM placed_infrastructure WHERE cityId = :cityId")
+    suspend fun clearCity(cityId: Long)
+
     @Query("SELECT * FROM placed_infrastructure WHERE cityId = :cityId")
     fun observeForCity(cityId: Long): Flow<List<PlacedInfrastructureEntity>>
 
@@ -179,6 +182,9 @@ interface RoadConnectionDao {
 
     @Query("DELETE FROM road_connection WHERE cityId = :cityId AND (tileAId = :tileId OR tileBId = :tileId)")
     suspend fun removeInvolvingTile(cityId: Long, tileId: Long)
+
+    @Query("DELETE FROM road_connection WHERE cityId = :cityId")
+    suspend fun clearCity(cityId: Long)
 
     @Query("SELECT * FROM road_connection WHERE cityId = :cityId")
     suspend fun getForCity(cityId: Long): List<RoadConnectionEntity>

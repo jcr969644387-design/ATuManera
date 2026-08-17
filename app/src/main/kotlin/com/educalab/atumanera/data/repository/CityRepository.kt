@@ -135,6 +135,13 @@ class CityRepository(private val db: AppDatabase) {
         return RemovalOutcome.Success(metrics)
     }
 
+    /** Elimina todas las construcciones de la ciudad de una sola vez y recalcula todo el estado. */
+    suspend fun clearCity(userId: Long, cityId: Long): PlacementOutcome.Success {
+        db.placedInfrastructureDao().clearCity(cityId)
+        db.roadConnectionDao().clearCity(cityId)
+        return finalizeCityUpdate(userId, cityId)
+    }
+
     private suspend fun linkRoadNeighbors(rows: Int, cols: Int, cityId: Long, tileId: Long, row: Int, col: Int) {
         val neighborOffsets = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         val connections = mutableListOf<RoadConnectionEntity>()

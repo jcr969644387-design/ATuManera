@@ -42,26 +42,14 @@ fun infraIconRes(code: String): Int = when (code) {
 fun avatarRes(code: String): Int = when (code) {
     "avatar_1" -> R.drawable.avatar_1
     "avatar_2" -> R.drawable.avatar_2
-    "avatar_3" -> R.drawable.avatar_3
-    "avatar_4" -> R.drawable.avatar_4
-    "avatar_5" -> R.drawable.avatar_5
-    "avatar_6" -> R.drawable.avatar_6
-    "avatar_7" -> R.drawable.avatar_7
-    "avatar_8" -> R.drawable.avatar_8
     else -> R.drawable.avatar_1
 }
 
 /** Nombre del rol representado por cada avatar, para mostrarlo al elegirlo. */
 fun avatarLabel(code: String): String = when (code) {
-    "avatar_1" -> "Niño con casco"
-    "avatar_2" -> "Niña con casco"
-    "avatar_3" -> "Constructor"
-    "avatar_4" -> "Constructora"
-    "avatar_5" -> "Diseñador"
-    "avatar_6" -> "Diseñadora"
-    "avatar_7" -> "Alcalde"
-    "avatar_8" -> "Supervisora"
-    else -> "Alcalde"
+    "avatar_1" -> "Constructor"
+    "avatar_2" -> "Constructora"
+    else -> "Constructor"
 }
 
 fun badgeIconRes(code: String): Int = when (code) {

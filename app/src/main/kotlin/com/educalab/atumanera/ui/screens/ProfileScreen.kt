@@ -5,14 +5,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -39,7 +37,7 @@ import com.educalab.atumanera.ui.components.avatarRes
 import com.educalab.atumanera.ui.theme.SkyBlueSoft
 import com.educalab.atumanera.ui.theme.SunAmber
 
-private val avatarCodes = (1..8).map { "avatar_$it" }
+private val avatarCodes = listOf("avatar_1", "avatar_2")
 
 @Composable
 fun ProfileScreen(viewModel: CityViewModel, onDone: () -> Unit) {
@@ -65,13 +63,11 @@ fun ProfileScreen(viewModel: CityViewModel, onDone: () -> Unit) {
 
             Text("Avatar", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp, bottom = 8.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+                modifier = Modifier.fillMaxWidth().weight(1f)
             ) {
-                items(avatarCodes) { code ->
+                avatarCodes.forEach { code ->
                     val selected = code == selectedAvatar
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -79,19 +75,19 @@ fun ProfileScreen(viewModel: CityViewModel, onDone: () -> Unit) {
                     ) {
                         androidx.compose.foundation.layout.Box(
                             modifier = Modifier
-                                .size(72.dp)
+                                .size(110.dp)
                                 .clip(CircleShape)
                                 .border(width = if (selected) 3.dp else 0.dp, color = SunAmber, shape = CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(painter = painterResource(avatarRes(code)), contentDescription = avatarLabel(code), modifier = Modifier.size(64.dp))
+                            Image(painter = painterResource(avatarRes(code)), contentDescription = avatarLabel(code), modifier = Modifier.size(100.dp))
                         }
                         Text(
                             avatarLabel(code),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            maxLines = 2,
-                            modifier = Modifier.padding(top = 4.dp)
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }

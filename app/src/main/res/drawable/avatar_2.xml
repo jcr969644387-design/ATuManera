@@ -1,18 +1,31 @@
-<!-- Niña con casco -->
+<!-- Constructora -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path android:fillColor="#FFFFFF" android:pathData="M4.32,54.0 a49.68,49.68 0 1,0 99.36,0 a49.68,49.68 0 1,0 -99.36,0 Z"/>
-    <path android:fillColor="#3AA6D6" android:pathData="M26.0,60.0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 Z"/>
-    <path android:fillColor="#2E4A5C" android:pathData="M34.0,36.0 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
-    <!-- Coletas -->
-    <path android:fillColor="#2E4A5C" android:pathData="M28,42 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z"/>
-    <path android:fillColor="#2E4A5C" android:pathData="M68,42 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0 Z"/>
-    <path android:fillColor="#2A2A2A" android:pathData="M40.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
-    <path android:fillColor="#2A2A2A" android:pathData="M60.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
-    <!-- Casco -->
-    <path android:fillColor="#FFC94D" android:pathData="M37,32 A17,14 0 0,1 71,32 L71,34 L37,34 Z"/>
-    <path android:fillColor="#E0A800" android:pathData="M30,29 L78,29 Q82,29 82,33 Q82,37 78,37 L30,37 Q26,37 26,33 Q26,29 30,29 Z"/>
+    <!-- Cola de cabello -->
+    <path android:fillColor="#7C4A3D" android:pathData="M75,44 Q92,50 86,70 L72,62 Z"/>
+    <!-- Hombros / camisa de trabajo -->
+    <path android:fillColor="#D65DA8" android:pathData="M26,78 L82,78 Q88,78 88,84 L88,100 L20,100 L20,84 Q20,78 26,78 Z"/>
+    <path android:fillColor="#B84A8E" android:pathData="M46,80 L62,80 L62,92 L46,92 Z"/>
+    <!-- Orejas -->
+    <path android:fillColor="#FFCB9A" android:pathData="M31,52 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"/>
+    <path android:fillColor="#FFCB9A" android:pathData="M67,52 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"/>
+    <!-- Cabeza -->
+    <path android:fillColor="#FFCB9A" android:pathData="M32,50 a22,22 0 1,0 44,0 a22,22 0 1,0 -44,0 Z"/>
+    <!-- Casco de ingeniera -->
+    <path android:fillColor="#FF7A1A" android:pathData="M33,40 A21,18 0 0,1 75,40 L75,43 L33,43 Z"/>
+    <path android:fillColor="#CC5D0E" android:pathData="M22,38 L86,38 Q91,38 91,43 Q91,48 86,48 L22,48 Q17,48 17,43 Q17,38 22,38 Z"/>
+    <path android:fillColor="#FFC28A" android:pathData="M50,40 a4,3.4 0 1,0 8,0 a4,3.4 0 1,0 -8,0 Z"/>
+    <!-- Ojos, pestañas y sonrisa -->
+    <path android:fillColor="#2A2A2A" android:pathData="M43,54 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
+    <path android:fillColor="#2A2A2A" android:pathData="M59,54 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
+    <path android:fillColor="#00000000" android:pathData="M40,50 L37,47" android:strokeColor="#2A2A2A" android:strokeWidth="1.6"/>
+    <path android:fillColor="#00000000" android:pathData="M68,50 L71,47" android:strokeColor="#2A2A2A" android:strokeWidth="1.6"/>
+    <path android:fillColor="#B5654A" android:pathData="M44,64 Q54,72 64,64 Q54,69 44,64 Z"/>
+    <!-- Mejillas -->
+    <path android:fillColor="#40FFA487" android:pathData="M37,59 a3.4,2.6 0 1,0 6.8,0 a3.4,2.6 0 1,0 -6.8,0 Z"/>
+    <path android:fillColor="#40FFA487" android:pathData="M64,59 a3.4,2.6 0 1,0 6.8,0 a3.4,2.6 0 1,0 -6.8,0 Z"/>
 </vector>

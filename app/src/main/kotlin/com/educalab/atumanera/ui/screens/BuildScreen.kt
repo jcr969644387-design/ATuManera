@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.AlertDialog
@@ -85,16 +87,18 @@ fun BuildScreen(
     onBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    val visual = categoryVisual(category)
+    var currentCategory by remember { mutableStateOf(category) }
+    val visual = categoryVisual(currentCategory)
     val context = LocalContext.current
     val vibrator = remember { androidx.core.content.ContextCompat.getSystemService(context, android.os.Vibrator::class.java) }
 
-    var selectedInfraId by remember(category) { mutableStateOf<Long?>(null) }
+    var selectedInfraId by remember(currentCategory) { mutableStateOf<Long?>(null) }
     var feedback by remember { mutableStateOf<String?>(null) }
     var pendingDelete by remember { mutableStateOf<Triple<Int, Int, String>?>(null) }
+    var confirmClearAll by remember { mutableStateOf(false) }
     var zoom by remember { mutableFloatStateOf(ZOOM_MIN) }
 
-    val catalogForCategory = state.catalog.filter { it.category == category.name }
+    val catalogForCategory = state.catalog.filter { it.category == currentCategory.name }
     val selectedInfra = catalogForCategory.firstOrNull { it.id == selectedInfraId }
     LaunchedEffect(catalogForCategory) {
         if (selectedInfraId == null && catalogForCategory.isNotEmpty()) selectedInfraId = catalogForCategory.first().id
@@ -130,12 +134,34 @@ fun BuildScreen(
     Surface(color = visual.softColor, modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
-                ScreenTopBar(title = visual.label, subtitle = "Toca una casilla libre para construir", onBack = onBack)
+                ScreenTopBar(
+                    title = visual.label,
+                    subtitle = "Elige un módulo y toca una casilla libre para construir",
+                    onBack = onBack,
+                    trailing = {
+                        IconButton(onClick = { confirmClearAll = true }) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar todas las construcciones")
+                        }
+                    }
+                )
 
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     val spent = state.latestMetric?.budgetSpent ?: 0
                     val total = state.city?.budgetTotal ?: 0
                     StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
+                }
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    items(InfraCategory.values().toList()) { cat ->
+                        CategoryChip(
+                            category = cat,
+                            selected = cat == currentCategory,
+                            onClick = { currentCategory = cat }
+                        )
+                    }
                 }
 
                 Text(
@@ -198,7 +224,7 @@ fun BuildScreen(
                             tiles = state.tiles,
                             rows = state.city!!.rows,
                             cols = state.city!!.cols,
-                            highlightCategory = category,
+                            highlightCategory = currentCategory,
                             modifier = Modifier.width(boardBaseWidth * zoom).padding(vertical = 8.dp),
                             onTileTap = { row, col ->
                                 val existing = state.tiles.firstOrNull { it.tile.row == row && it.tile.col == col }
@@ -214,7 +240,7 @@ fun BuildScreen(
                 }
 
                 Text(
-                    categoryTip(category),
+                    categoryTip(currentCategory),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)
@@ -251,6 +277,53 @@ fun BuildScreen(
             dismissButton = {
                 TextButton(onClick = { pendingDelete = null }) { Text("Cancelar") }
             }
+        )
+    }
+
+    if (confirmClearAll) {
+        AlertDialog(
+            onDismissRequest = { confirmClearAll = false },
+            icon = { Icon(Icons.Filled.DeleteSweep, contentDescription = null) },
+            title = { Text("¿Eliminar TODAS las construcciones?") },
+            text = { Text("Vas a borrar todo lo que has construido en tu ciudad: calles, casas y servicios. Recuperarás todo el presupuesto invertido, pero esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.clearCity()
+                    confirmClearAll = false
+                }) { Text("Eliminar todo") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmClearAll = false }) { Text("Cancelar") }
+            }
+        )
+    }
+}
+
+@Composable
+private fun CategoryChip(category: InfraCategory, selected: Boolean, onClick: () -> Unit) {
+    val visual = categoryVisual(category)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .clip(CircleShape)
+                .background(if (selected) visual.color else visual.softColor)
+                .border(width = if (selected) 2.dp else 0.dp, color = visual.color, shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(painter = painterResource(visual.moduleIconRes), contentDescription = visual.label, modifier = Modifier.size(30.dp))
+        }
+        Text(
+            visual.label,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+            color = if (selected) visual.color else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 2.dp).width(64.dp),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            maxLines = 2
         )
     }
 }
