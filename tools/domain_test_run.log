@@ -1,0 +1,47 @@
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.can afford when cost fits exactly in remaining budget
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.cannot afford a non positive cost
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.cannot afford when cost exceeds remaining budget by one
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.place approves and returns the new spent amount
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.place rejects a zero or negative cost
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.place rejects when budget is insufficient
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.refund never leaves spent below zero
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.refund reduces the spent amount
+PASS  com.educalab.atumanera.domain.logic.BudgetManagerTest.refund rejects a non positive cost
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.a house directly adjacent to a service without roads between is still evaluated via road entry
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.adjacent road tiles form a single connected component
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.coverage is empty when there are no houses
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.coverage is empty when there are no services
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.coverage percent rounds down using integer division
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.diagonal road tiles are not connected
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.disconnected road segments form separate components
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.empty grid has no road components
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.house and service on different road components are not connected
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.house beyond coverage radius is not covered
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.house within radius through connected road is covered
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.mobility percent counts only houses adjacent to a road
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.mobility percent is 100 when every house touches a road
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.mobility percent is zero without houses
+PASS  com.educalab.atumanera.domain.logic.GridEngineTest.single road tile forms a component of size one
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.budget remaining never goes below zero even if overspent
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.budget spent and total are preserved in the snapshot
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.empty city has all metrics at zero
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.green score combines park coverage and planting density
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.mobility reflects grid engine calculation
+PASS  com.educalab.atumanera.domain.logic.MetricsCalculatorTest.services score averages education health and water coverage
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.budget efficiency requirement rewards low spending
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.coverage count requirement reads from the coverage map
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.metric threshold requirement uses the correct metric key
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.mission with multiple requirements needs all of them satisfied
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.mission with no requirements is never complete
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.place count requirement completes when target is reached
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.place count requirement reports partial progress
+PASS  com.educalab.atumanera.domain.logic.MissionEvaluatorTest.road network size requirement checks the largest connected component
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.decorations requiring higher metrics stay locked when not met
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.decorations unlock based on their own thresholds
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.first road badge unlocks after placing one road
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.mission count badges unlock progressively
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.mobility master badge requires 90 percent mobility
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.no badges unlock with an empty context
+PASS  com.educalab.atumanera.domain.logic.UnlockEvaluatorTest.xp badge unlocks exactly at threshold
+----------------------------------------
+TOTAL=45 PASSED=45 FAILED=0

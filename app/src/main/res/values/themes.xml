@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.ATuManera" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#14335A</item>
+        <item name="android:windowBackground">#FAF6EE</item>
+    </style>
+</resources>

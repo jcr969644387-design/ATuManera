@@ -1,0 +1,63 @@
+name: Android CI Build
+
+# Este workflow se ejecuta en la infraestructura de GitHub Actions, que sí tiene
+# acceso completo a Internet (dl.google.com, services.gradle.org, Maven Central).
+# El entorno usado para generar este proyecto no tenía ese acceso, por lo que
+# la compilación no pudo verificarse localmente (ver docs/BUILD_REPORT.md).
+# Al hacer push de este repositorio, este workflow compila y prueba la app de verdad.
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Dar permisos de ejecución a gradlew
+        run: chmod +x ./gradlew
+
+      - name: Limpiar
+        run: ./gradlew clean
+
+      - name: Ejecutar tests unitarios (57 tests)
+        run: ./gradlew testDebugUnitTest
+
+      - name: Ejecutar lint
+        run: ./gradlew lintDebug
+
+      - name: Generar APK de depuración
+        run: ./gradlew assembleDebug
+
+      - name: Subir APK como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ATuManera-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Subir reporte de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/test-results/**/*.xml
+
+      - name: Subir reporte de lint
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.html
