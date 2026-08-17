@@ -1,3 +1,4 @@
+<!-- Constructor -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -8,4 +9,12 @@
     <path android:fillColor="#5C2E2E" android:pathData="M34.0,36.0 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
     <path android:fillColor="#2A2A2A" android:pathData="M40.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
     <path android:fillColor="#2A2A2A" android:pathData="M60.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
+    <!-- Chaleco reflectante -->
+    <path android:fillColor="#FFD84D" android:pathData="M30,66 L78,66 L78,72 L30,72 Z"/>
+    <!-- Casco -->
+    <path android:fillColor="#FF7A1A" android:pathData="M37,32 A17,14 0 0,1 71,32 L71,34 L37,34 Z"/>
+    <path android:fillColor="#CC5D0E" android:pathData="M30,29 L78,29 Q82,29 82,33 Q82,37 78,37 L30,37 Q26,37 26,33 Q26,29 30,29 Z"/>
+    <!-- Llave inglesa -->
+    <path android:fillColor="#7C8894" android:pathData="M64,70 L74,80 L71,83 L61,73 Z"/>
+    <path android:fillColor="#7C8894" android:pathData="M73,77 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
 </vector>

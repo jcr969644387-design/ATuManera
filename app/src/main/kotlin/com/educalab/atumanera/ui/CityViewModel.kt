@@ -42,6 +42,8 @@ data class CityBoardState(
 )
 
 sealed class CityEvent {
+    object Placed : CityEvent()
+    object Removed : CityEvent()
     data class MissionsCompleted(val codes: List<String>) : CityEvent()
     data class BadgesEarned(val codes: List<String>) : CityEvent()
     data class Rejected(val reason: String) : CityEvent()
@@ -94,6 +96,7 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         viewModelScope.launch {
             when (val outcome = repository.placeInfrastructure(u.id, city.id, row, col, infrastructureTypeId)) {
                 is PlacementOutcome.Success -> {
+                    _events.tryEmit(CityEvent.Placed)
                     if (outcome.newlyCompletedMissions.isNotEmpty()) _events.tryEmit(CityEvent.MissionsCompleted(outcome.newlyCompletedMissions))
                     if (outcome.newBadges.isNotEmpty()) _events.tryEmit(CityEvent.BadgesEarned(outcome.newBadges))
                 }
@@ -109,6 +112,7 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         val city = state.value.city ?: return
         viewModelScope.launch {
             repository.removeInfrastructure(u.id, city.id, row, col)
+            _events.tryEmit(CityEvent.Removed)
         }
     }
 

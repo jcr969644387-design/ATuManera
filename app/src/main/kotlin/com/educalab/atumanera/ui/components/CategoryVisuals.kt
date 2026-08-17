@@ -51,6 +51,19 @@ fun avatarRes(code: String): Int = when (code) {
     else -> R.drawable.avatar_1
 }
 
+/** Nombre del rol representado por cada avatar, para mostrarlo al elegirlo. */
+fun avatarLabel(code: String): String = when (code) {
+    "avatar_1" -> "Niño con casco"
+    "avatar_2" -> "Niña con casco"
+    "avatar_3" -> "Constructor"
+    "avatar_4" -> "Constructora"
+    "avatar_5" -> "Diseñador"
+    "avatar_6" -> "Diseñadora"
+    "avatar_7" -> "Alcalde"
+    "avatar_8" -> "Supervisora"
+    else -> "Alcalde"
+}
+
 fun badgeIconRes(code: String): Int = when (code) {
     "BADGE_FIRST_ROAD" -> R.drawable.ic_badge_road
     "BADGE_FIRST_HOUSE" -> R.drawable.ic_badge_house

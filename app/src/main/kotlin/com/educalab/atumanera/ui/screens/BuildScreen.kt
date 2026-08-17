@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,23 +12,33 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,10 +58,24 @@ import com.educalab.atumanera.ui.CityViewModel
 import com.educalab.atumanera.ui.components.CityGridCanvas
 import com.educalab.atumanera.ui.components.ScreenTopBar
 import com.educalab.atumanera.ui.components.StatPill
+import com.educalab.atumanera.util.SoundFeedback
 import com.educalab.atumanera.ui.components.categoryVisual
 import com.educalab.atumanera.ui.components.infraIconRes
 import com.educalab.atumanera.util.AppPreferences
 import kotlinx.coroutines.flow.collectLatest
+
+private const val ZOOM_MIN = 1f
+private const val ZOOM_MAX = 2.2f
+private const val ZOOM_STEP = 0.3f
+
+private fun categoryTip(category: InfraCategory): String = when (category) {
+    InfraCategory.ROAD -> "Las calles deben tocarse entre sí para formar una red. Una casa solo tiene movilidad si está pegada a una calle conectada a esa red."
+    InfraCategory.HOUSING -> "Coloca una calle junto a cada casa: sin acceso a la red de carreteras, la vivienda no cuenta para movilidad ni puede recibir servicios."
+    InfraCategory.EDUCATION, InfraCategory.HEALTH, InfraCategory.WATER ->
+        "Este servicio solo cubre casas que están conectadas por calles a la MISMA red que el edificio, y dentro de su radio de alcance (revisa la descripción de cada construcción)."
+    InfraCategory.PARK -> "Los parques suman al puntaje verde por su cobertura y por la cantidad de parques respecto a tus casas."
+    InfraCategory.TRANSPORT -> "El transporte público refuerza la movilidad de las casas que están dentro de su alcance."
+}
 
 @Composable
 fun BuildScreen(
@@ -65,95 +91,167 @@ fun BuildScreen(
 
     var selectedInfraId by remember(category) { mutableStateOf<Long?>(null) }
     var feedback by remember { mutableStateOf<String?>(null) }
+    var pendingDelete by remember { mutableStateOf<Triple<Int, Int, String>?>(null) }
+    var zoom by remember { mutableFloatStateOf(ZOOM_MIN) }
 
     val catalogForCategory = state.catalog.filter { it.category == category.name }
+    val selectedInfra = catalogForCategory.firstOrNull { it.id == selectedInfraId }
     LaunchedEffect(catalogForCategory) {
         if (selectedInfraId == null && catalogForCategory.isNotEmpty()) selectedInfraId = catalogForCategory.first().id
     }
 
     LaunchedEffect(viewModel) {
         viewModel.events.collectLatest { event ->
-            feedback = when (event) {
-                is CityEvent.MissionsCompleted -> "¡Misión completada! Sigue así."
-                is CityEvent.BadgesEarned -> "¡Nueva insignia desbloqueada!"
-                is CityEvent.Rejected -> event.reason
+            when (event) {
+                is CityEvent.MissionsCompleted -> feedback = "¡Misión completada! Sigue así."
+                is CityEvent.BadgesEarned -> feedback = "¡Nueva insignia desbloqueada!"
+                is CityEvent.Rejected -> feedback = event.reason
+                CityEvent.Placed, CityEvent.Removed -> Unit
             }
+
             if (preferences.hapticsEnabled) {
+                val pattern = if (event is CityEvent.Rejected) 80L else 35L
                 @Suppress("DEPRECATION")
-                vibrator?.vibrate(40)
+                vibrator?.vibrate(pattern)
+            }
+            if (preferences.soundEnabled) {
+                when (event) {
+                    is CityEvent.Rejected -> SoundFeedback.playReject()
+                    is CityEvent.MissionsCompleted, is CityEvent.BadgesEarned -> SoundFeedback.playSuccess()
+                    else -> SoundFeedback.playBuild()
+                }
             }
         }
     }
 
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
+    val boardBaseWidth = (screenWidthDp - 32.dp).coerceAtLeast(200.dp)
+
     Surface(color = visual.softColor, modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            ScreenTopBar(title = visual.label, subtitle = "Toca una casilla libre para construir", onBack = onBack)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                ScreenTopBar(title = visual.label, subtitle = "Toca una casilla libre para construir", onBack = onBack)
 
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                val spent = state.latestMetric?.budgetSpent ?: 0
-                val total = state.city?.budgetTotal ?: 0
-                StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
-            }
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    val spent = state.latestMetric?.budgetSpent ?: 0
+                    val total = state.city?.budgetTotal ?: 0
+                    StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
+                }
 
-            Text(
-                "Elige qué construir",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                Text(
+                    "Elige qué construir",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
-            ) {
-                items(catalogForCategory) { infra ->
-                    InfraOptionCard(
-                        infra = infra,
-                        selected = infra.id == selectedInfraId,
-                        color = visual.color,
-                        onClick = { selectedInfraId = infra.id }
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+                ) {
+                    items(catalogForCategory) { infra ->
+                        InfraOptionCard(
+                            infra = infra,
+                            selected = infra.id == selectedInfraId,
+                            color = visual.color,
+                            onClick = { selectedInfraId = infra.id }
+                        )
+                    }
+                }
+
+                if (selectedInfra != null) {
+                    Text(
+                        selectedInfra.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                     )
                 }
+
+                if (state.isReady && state.city != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Zoom del mapa",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { zoom = (zoom - ZOOM_STEP).coerceAtLeast(ZOOM_MIN) }, enabled = zoom > ZOOM_MIN) {
+                            Icon(Icons.Filled.ZoomOut, contentDescription = "Alejar mapa")
+                        }
+                        IconButton(onClick = { zoom = (zoom + ZOOM_STEP).coerceAtMost(ZOOM_MAX) }, enabled = zoom < ZOOM_MAX) {
+                            Icon(Icons.Filled.ZoomIn, contentDescription = "Acercar mapa")
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 420.dp)
+                            .padding(horizontal = 16.dp)
+                            .horizontalScroll(rememberScrollState())
+                    ) {
+                        CityGridCanvas(
+                            tiles = state.tiles,
+                            rows = state.city!!.rows,
+                            cols = state.city!!.cols,
+                            highlightCategory = category,
+                            modifier = Modifier.width(boardBaseWidth * zoom).padding(vertical = 8.dp),
+                            onTileTap = { row, col ->
+                                val existing = state.tiles.firstOrNull { it.tile.row == row && it.tile.col == col }
+                                if (existing?.infraType != null) {
+                                    pendingDelete = Triple(row, col, existing.infraType?.name ?: "esta construcción")
+                                } else {
+                                    val infraId = selectedInfraId
+                                    if (infraId != null) viewModel.place(row, col, infraId)
+                                }
+                            }
+                        )
+                    }
+                }
+
+                Text(
+                    categoryTip(category),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp)
+                )
             }
 
             feedback?.let { msg ->
-                Snackbar(modifier = Modifier.padding(12.dp), action = {}) { Text(msg) }
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    action = {}
+                ) { Text(msg) }
                 LaunchedEffect(msg) {
                     kotlinx.coroutines.delay(2200)
                     feedback = null
                 }
             }
-
-            if (state.isReady && state.city != null) {
-                CityGridCanvas(
-                    tiles = state.tiles,
-                    rows = state.city!!.rows,
-                    cols = state.city!!.cols,
-                    highlightCategory = category,
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    onTileTap = { row, col ->
-                        val existing = state.tiles.firstOrNull { it.tile.row == row && it.tile.col == col }
-                        if (existing?.infraType != null) {
-                            if (existing.infraType?.category == category.name) {
-                                viewModel.remove(row, col)
-                            } else {
-                                feedback = "Esa casilla ya tiene otra construcción (${existing.infraType?.name})."
-                            }
-                        } else {
-                            val infraId = selectedInfraId
-                            if (infraId != null) viewModel.place(row, col, infraId)
-                        }
-                    }
-                )
-            }
-
-            Text(
-                "Consejo: coloca calles primero para conectar tus casas con los servicios.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
-            )
         }
+    }
+
+    pendingDelete?.let { (row, col, name) ->
+        AlertDialog(
+            onDismissRequest = { pendingDelete = null },
+            icon = { Icon(Icons.Filled.Delete, contentDescription = null) },
+            title = { Text("¿Eliminar construcción?") },
+            text = { Text("Vas a eliminar \"$name\". Recuperarás el presupuesto invertido y podrás construir algo nuevo en esta casilla.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.remove(row, col)
+                    pendingDelete = null
+                }) { Text("Eliminar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDelete = null }) { Text("Cancelar") }
+            }
+        )
     }
 }
 

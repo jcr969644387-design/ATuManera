@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.educalab.atumanera.ui.CityViewModel
+import com.educalab.atumanera.ui.components.avatarLabel
 import com.educalab.atumanera.ui.components.avatarRes
 import com.educalab.atumanera.ui.theme.SkyBlueSoft
 import com.educalab.atumanera.ui.theme.SunAmber
@@ -72,15 +73,26 @@ fun ProfileScreen(viewModel: CityViewModel, onDone: () -> Unit) {
             ) {
                 items(avatarCodes) { code ->
                     val selected = code == selectedAvatar
-                    androidx.compose.foundation.layout.Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(CircleShape)
-                            .border(width = if (selected) 3.dp else 0.dp, color = SunAmber, shape = CircleShape)
-                            .clickable { selectedAvatar = code },
-                        contentAlignment = Alignment.Center
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.clickable { selectedAvatar = code }
                     ) {
-                        Image(painter = painterResource(avatarRes(code)), contentDescription = code, modifier = Modifier.size(64.dp))
+                        androidx.compose.foundation.layout.Box(
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape)
+                                .border(width = if (selected) 3.dp else 0.dp, color = SunAmber, shape = CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(painter = painterResource(avatarRes(code)), contentDescription = avatarLabel(code), modifier = Modifier.size(64.dp))
+                        }
+                        Text(
+                            avatarLabel(code),
+                            style = MaterialTheme.typography.labelSmall,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            maxLines = 2,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
                     }
                 }
             }

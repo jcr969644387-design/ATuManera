@@ -1,6 +1,7 @@
 package com.educalab.atumanera.ui.screens
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,8 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.educalab.atumanera.R
 import com.educalab.atumanera.data.local.entity.CityMetricEntity
 import com.educalab.atumanera.ui.CityViewModel
 import com.educalab.atumanera.ui.CollectionViewModel
@@ -76,6 +79,48 @@ fun IndicatorsCollectionScreen(
                         )
                     ) { (label, value, color) ->
                         StatPill(label, "$value%", color, Modifier.fillMaxWidth())
+                    }
+                }
+            }
+
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White)
+                ) {
+                    Row(modifier = Modifier.padding(14.dp)) {
+                        Image(
+                            painter = painterResource(R.drawable.mascot_guide),
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(Modifier.size(10.dp))
+                        Column {
+                            Text(
+                                "¿Qué significan estos indicadores?",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(Modifier.size(4.dp))
+                            Text(
+                                "• Movilidad: % de tus casas que tienen una calle justo al lado. Construye calles pegadas a cada casa y conéctalas entre sí.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.size(4.dp))
+                            Text(
+                                "• Servicios: promedio de cobertura de educación, salud y agua. Cada casa necesita calles que la conecten con ese edificio, dentro de su radio de alcance.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(Modifier.size(4.dp))
+                            Text(
+                                "• Áreas verdes: combina la cobertura de parques con tener al menos 1 parque por cada 4 casas.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

@@ -41,9 +41,9 @@ private data class OnboardingPage(val title: String, val body: String, val iconR
 
 private val pages = listOf(
     OnboardingPage(
-        "Bienvenido a A Tu Manera",
+        "¡Bienvenido a tu ciudad!",
         "Vas a diseñar y hacer crecer tu propia ciudad: calles, casas, escuelas, hospitales, parques y mucho más.",
-        R.drawable.logo_city
+        R.drawable.ic_onboarding_hero
     ),
     OnboardingPage(
         "Conoce a tu ayudante",

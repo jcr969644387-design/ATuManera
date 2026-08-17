@@ -1,3 +1,4 @@
+<!-- Diseñadora -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
@@ -6,6 +7,16 @@
     <path android:fillColor="#FFFFFF" android:pathData="M4.32,54.0 a49.68,49.68 0 1,0 99.36,0 a49.68,49.68 0 1,0 -99.36,0 Z"/>
     <path android:fillColor="#E08A3C" android:pathData="M26.0,60.0 a28,28 0 1,0 56,0 a28,28 0 1,0 -56,0 Z"/>
     <path android:fillColor="#5C3B1E" android:pathData="M34.0,36.0 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
-    <path android:fillColor="#2A2A2A" android:pathData="M40.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
-    <path android:fillColor="#2A2A2A" android:pathData="M60.0,56.0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
+    <!-- Cola de cabello -->
+    <path android:fillColor="#5C3B1E" android:pathData="M72,38 Q82,42 78,54 L70,50 Z"/>
+    <!-- Gafas -->
+    <path android:fillColor="#2A2A2A" android:pathData="M38,54 L50,54 L50,58 L38,58 Z"/>
+    <path android:fillColor="#2A2A2A" android:pathData="M58,54 L70,54 L70,58 L58,58 Z"/>
+    <path android:fillColor="#2A2A2A" android:pathData="M50,55.5 L58,55.5 L58,56.5 L50,56.5 Z"/>
+    <path android:fillColor="#FFE0C2" android:pathData="M39,55 L49,55 L49,57 L39,57 Z"/>
+    <path android:fillColor="#FFE0C2" android:pathData="M59,55 L69,55 L69,57 L59,57 Z"/>
+    <!-- Plano bajo el brazo -->
+    <path android:fillColor="#FFFFFF" android:pathData="M26,72 L44,68 L46,76 L28,80 Z"/>
+    <path android:fillColor="#00000000" android:pathData="M30,72 L40,70" android:strokeColor="#E08A3C" android:strokeWidth="1.4"/>
+    <path android:fillColor="#00000000" android:pathData="M30,76 L40,74" android:strokeColor="#E08A3C" android:strokeWidth="1.4"/>
 </vector>
