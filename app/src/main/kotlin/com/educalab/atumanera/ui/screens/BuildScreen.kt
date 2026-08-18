@@ -36,6 +36,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -210,23 +211,13 @@ fun BuildScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!freeMode) {
-                        Text(
-                            "Elige qué construir",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
-                        )
-                    } else {
-                        Spacer(Modifier.weight(1f))
-                    }
-                    IconButton(onClick = { confirmClearCategory = true }) {
-                        Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar solo ${visual.label}")
-                    }
+                if (!freeMode) {
+                    Text(
+                        "Elige qué construir",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
 
                 // En Modo Libre se oculta la tarjeta de selección (imagen +
@@ -275,8 +266,21 @@ fun BuildScreen(
                         IconButton(onClick = { zoom = (zoom + ZOOM_STEP).coerceAtMost(ZOOM_MAX) }, enabled = zoom < ZOOM_MAX) {
                             Icon(Icons.Filled.ZoomIn, contentDescription = "Acercar mapa")
                         }
-                        IconButton(onClick = { confirmClearAll = true }) {
-                            Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar todas las construcciones")
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(onClick = { confirmClearCategory = true }, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.size(6.dp))
+                            Text("Borrar módulo", style = MaterialTheme.typography.labelMedium)
+                        }
+                        OutlinedButton(onClick = { confirmClearAll = true }, modifier = Modifier.weight(1f)) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.size(6.dp))
+                            Text("Borrar todo", style = MaterialTheme.typography.labelMedium)
                         }
                     }
 
