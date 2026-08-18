@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.educalab.atumanera.ui.screens
 
 import androidx.compose.foundation.Image
