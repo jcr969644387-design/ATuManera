@@ -46,6 +46,7 @@ class MissionsViewModel(private val repository: CityRepository) : ViewModel() {
                         "COMPLETED" -> MissionStatus.COMPLETED
                         "IN_PROGRESS" -> MissionStatus.IN_PROGRESS
                         "AVAILABLE" -> MissionStatus.AVAILABLE
+                        "LOCKED" -> MissionStatus.LOCKED
                         else -> if (mission.orderIndex == 1) MissionStatus.AVAILABLE else MissionStatus.LOCKED
                     }
                     MissionUiItem(mission, status, p?.progressPercent ?: 0)

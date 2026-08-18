@@ -236,31 +236,56 @@ class CityRepository(private val db: AppDatabase) {
         val newlyCompleted = mutableListOf<String>()
         val completedMissionIds = mutableSetOf<Long>()
 
+        // Las misiones se evalúan nivel por nivel, en orden. Un nivel solo se
+        // evalúa (y por tanto solo puede completarse) si el nivel anterior ya
+        // está 100% completo; mientras tanto sus misiones quedan BLOQUEADAS.
         val allMissions = db.missionDao().getAllList()
-        for (mission in allMissions) {
-            val requirements = db.missionRequirementDao().getForMission(mission.id).map {
-                MissionRequirementInput(RequirementType.valueOf(it.type), it.requirementKey, it.targetValue)
-            }
-            val evaluation = missionEvaluator.evaluate(mission.id, requirements, state)
-            val existingProgress = db.missionProgressDao().getFor(userId, cityId, mission.id)
-            val alreadyCompleted = existingProgress?.status == "COMPLETED"
+        val levelRanges = listOf(LEVEL_1_RANGE, LEVEL_2_RANGE, LEVEL_3_RANGE, LEVEL_4_RANGE)
+        var previousLevelUnlocked = true
 
-            if (evaluation.isComplete && !alreadyCompleted) {
-                db.missionProgressDao().upsert(
-                    MissionProgressEntity(0, userId, cityId, mission.id, "COMPLETED", 100, System.currentTimeMillis())
-                )
-                totalXp += mission.rewardXp
-                missionsCompleted += 1
-                newlyCompleted.add(mission.code)
-                completedMissionIds.add(mission.id)
-            } else if (!alreadyCompleted) {
-                val status = if (evaluation.progressPercent > 0) "IN_PROGRESS" else "AVAILABLE"
-                db.missionProgressDao().upsert(
-                    MissionProgressEntity(0, userId, cityId, mission.id, status, evaluation.progressPercent, null)
-                )
-            } else {
-                completedMissionIds.add(mission.id)
+        for (range in levelRanges) {
+            val missionsInLevel = allMissions.filter { it.orderIndex in range }
+
+            for (mission in missionsInLevel) {
+                val existingProgress = db.missionProgressDao().getFor(userId, cityId, mission.id)
+                val alreadyCompleted = existingProgress?.status == "COMPLETED"
+
+                if (alreadyCompleted) {
+                    completedMissionIds.add(mission.id)
+                    continue
+                }
+
+                if (!previousLevelUnlocked) {
+                    if (existingProgress?.status != "LOCKED") {
+                        db.missionProgressDao().upsert(
+                            MissionProgressEntity(0, userId, cityId, mission.id, "LOCKED", 0, null)
+                        )
+                    }
+                    continue
+                }
+
+                val requirements = db.missionRequirementDao().getForMission(mission.id).map {
+                    MissionRequirementInput(RequirementType.valueOf(it.type), it.requirementKey, it.targetValue)
+                }
+                val evaluation = missionEvaluator.evaluate(mission.id, requirements, state)
+
+                if (evaluation.isComplete) {
+                    db.missionProgressDao().upsert(
+                        MissionProgressEntity(0, userId, cityId, mission.id, "COMPLETED", 100, System.currentTimeMillis())
+                    )
+                    totalXp += mission.rewardXp
+                    missionsCompleted += 1
+                    newlyCompleted.add(mission.code)
+                    completedMissionIds.add(mission.id)
+                } else {
+                    val status = if (evaluation.progressPercent > 0) "IN_PROGRESS" else "AVAILABLE"
+                    db.missionProgressDao().upsert(
+                        MissionProgressEntity(0, userId, cityId, mission.id, status, evaluation.progressPercent, null)
+                    )
+                }
             }
+
+            previousLevelUnlocked = missionsInLevel.isNotEmpty() && missionsInLevel.all { it.id in completedMissionIds }
         }
 
         // Al completar cada nivel de misiones por completo se libera presupuesto
