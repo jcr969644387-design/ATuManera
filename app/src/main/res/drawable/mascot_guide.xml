@@ -3,13 +3,34 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#F6A623" android:pathData="M24,70 L84,70 Q88,70 88,74 L88,80 Q88,84 84,84 L24,84 Q20,84 20,80 L20,74 Q20,70 24,70 Z"/>
-    <path android:fillColor="#3A4650" android:pathData="M46,20 L56,20 L56,80 L46,80 Z"/>
-    <path android:fillColor="#3A4650" android:pathData="M34,20 L70,20 Q74,20 74,24 L74,24 Q74,28 70,28 L34,28 Q30,28 30,24 L30,24 Q30,20 34,20 Z"/>
-    <path android:fillColor="#E0791A" android:pathData="M26,24 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z"/>
-    <path android:fillColor="#7C8894" android:pathData="M26,40 L34,40 L34,66 L26,66 Z"/>
-    <path android:fillColor="#FFE6BF" android:pathData="M42,46 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z"/>
-    <path android:fillColor="#1D2733" android:pathData="M50,44 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
-    <path android:fillColor="#1D2733" android:pathData="M60,44 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
-    <path android:fillColor="#E0791A" android:pathData="M53,52 L63,52 L58,57 Z"/>
+    <!-- Sombra en el suelo -->
+    <path android:fillColor="#1A143355" android:pathData="M32,96 a22,5 0 1,0 44,0 a22,5 0 1,0 -44,0 Z"/>
+    <!-- Base / orugas -->
+    <path android:fillColor="#3A4650" android:pathData="M28,84 L80,84 Q86,84 86,90 Q86,94 80,94 L28,94 Q22,94 22,90 Q22,84 28,84 Z"/>
+    <path android:fillColor="#1D2733" android:pathData="M32,90 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"/>
+    <path android:fillColor="#1D2733" android:pathData="M46,90 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"/>
+    <path android:fillColor="#1D2733" android:pathData="M60,90 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z"/>
+    <!-- Contrapeso -->
+    <path android:fillColor="#7C8894" android:pathData="M16,18 L34,18 Q38,18 38,22 L38,28 Q38,32 34,32 L16,32 Q12,32 12,28 L12,22 Q12,18 16,18 Z"/>
+    <!-- Pluma / brazo horizontal -->
+    <path android:fillColor="#3A4650" android:pathData="M16,20 L92,20 Q96,20 96,24 Q96,28 92,28 L16,28 Q12,28 12,24 Q12,20 16,20 Z"/>
+    <!-- Cable y gancho -->
+    <path android:fillColor="#00000000" android:pathData="M86,28 L86,50" android:strokeColor="#7C8894" android:strokeWidth="2"/>
+    <path android:fillColor="#00000000" android:pathData="M82,50 Q82,56 86,56 Q90,56 90,50" android:strokeColor="#F6A623" android:strokeWidth="3.4"/>
+    <!-- Mástil -->
+    <path android:fillColor="#3A4650" android:pathData="M47,28 L61,28 L61,86 L47,86 Z"/>
+    <path android:fillColor="#2A333C" android:pathData="M47,28 L52,28 L52,86 L47,86 Z"/>
+    <!-- Cabina / rostro -->
+    <path android:fillColor="#FFCB9A" android:pathData="M34,58 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
+    <!-- Casco de la cabina -->
+    <path android:fillColor="#F6A623" android:pathData="M38,48 A16,14 0 0,1 70,48 L70,50 L38,50 Z"/>
+    <path android:fillColor="#E0791A" android:pathData="M32,46 L76,46 Q80,46 80,50 Q80,54 76,54 L32,54 Q28,54 28,50 Q28,46 32,46 Z"/>
+    <path android:fillColor="#FFD9A0" android:pathData="M48,48 a3.6,3 0 1,0 7.2,0 a3.6,3 0 1,0 -7.2,0 Z"/>
+    <!-- Ojos y sonrisa -->
+    <path android:fillColor="#2A2A2A" android:pathData="M44,60 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
+    <path android:fillColor="#2A2A2A" android:pathData="M58,60 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
+    <path android:fillColor="#00000000" android:pathData="M45,68 Q54,76 63,68" android:strokeColor="#B5654A" android:strokeWidth="2.6"/>
+    <!-- Mejillas -->
+    <path android:fillColor="#40FFA487" android:pathData="M39,64 a3.2,2.4 0 1,0 6.4,0 a3.2,2.4 0 1,0 -6.4,0 Z"/>
+    <path android:fillColor="#40FFA487" android:pathData="M62,64 a3.2,2.4 0 1,0 6.4,0 a3.2,2.4 0 1,0 -6.4,0 Z"/>
 </vector>
