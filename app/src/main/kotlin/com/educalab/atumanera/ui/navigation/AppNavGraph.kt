@@ -31,11 +31,13 @@ object Routes {
     const val PROFILE = "profile"
     const val HOME = "home"
     const val BUILD = "build/{category}"
+    const val FREE_BUILD = "free_build/{category}"
     const val MISSIONS = "missions"
     const val INDICATORS = "indicators"
     const val SETTINGS = "settings"
 
     fun build(category: InfraCategory) = "build/${category.name}"
+    fun freeBuild(category: InfraCategory) = "free_build/${category.name}"
 }
 
 @Composable
@@ -45,6 +47,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     val cityViewModel: CityViewModel = viewModel(factory = CityViewModelFactory(repository))
+    val freeCityViewModel: CityViewModel = viewModel(key = "freeCityViewModel", factory = CityViewModelFactory(repository, freeMode = true))
     val missionsViewModel: MissionsViewModel = viewModel(factory = MissionsViewModelFactory(repository))
     val collectionViewModel: CollectionViewModel = viewModel(factory = CollectionViewModelFactory(repository))
 
@@ -70,6 +73,7 @@ fun AppNavGraph(
                 cityViewModel = cityViewModel,
                 missionsViewModel = missionsViewModel,
                 onOpenBuild = { category -> navController.navigate(Routes.build(category)) },
+                onOpenFreeMode = { navController.navigate(Routes.freeBuild(InfraCategory.ROAD)) },
                 onOpenMissions = { navController.navigate(Routes.MISSIONS) },
                 onOpenIndicators = { navController.navigate(Routes.INDICATORS) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) }
@@ -87,6 +91,21 @@ fun AppNavGraph(
                 preferences = preferences,
                 onBack = { navController.popBackStack() },
                 onOpenMissions = { navController.navigate(Routes.MISSIONS) }
+            )
+        }
+        composable(
+            route = Routes.FREE_BUILD,
+            arguments = listOf(navArgument("category") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val categoryName = backStackEntry.arguments?.getString("category") ?: InfraCategory.ROAD.name
+            BuildScreen(
+                category = InfraCategory.valueOf(categoryName),
+                viewModel = freeCityViewModel,
+                missionsViewModel = missionsViewModel,
+                preferences = preferences,
+                onBack = { navController.popBackStack() },
+                onOpenMissions = { navController.navigate(Routes.MISSIONS) },
+                freeMode = true
             )
         }
         composable(Routes.MISSIONS) {

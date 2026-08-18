@@ -76,6 +76,14 @@ fun badgeIconRes(code: String): Int = when (code) {
     "BADGE_MISSION_10" -> R.drawable.ic_badge_missions10
     "BADGE_MISSION_20" -> R.drawable.ic_badge_missions20
     "BADGE_XP_500" -> R.drawable.ic_badge_xp
+    "BADGE_LEVEL1_MASTER" -> R.drawable.ic_badge_level1
+    "BADGE_LEVEL2_MASTER" -> R.drawable.ic_badge_level2
+    "BADGE_LEVEL3_MASTER" -> R.drawable.ic_badge_level3
+    "BADGE_GRAND_MASTER" -> R.drawable.ic_badge_grandmaster
+    "BADGE_TRANSPORT_MASTER" -> R.drawable.ic_badge_transport
+    "BADGE_MEGA_CITY" -> R.drawable.ic_badge_megacity
+    "BADGE_PERFECT_CITY" -> R.drawable.ic_badge_perfect
+    "BADGE_BUDGET_GENIUS" -> R.drawable.ic_badge_geniusbudget
     else -> R.drawable.ic_badge_xp
 }
 

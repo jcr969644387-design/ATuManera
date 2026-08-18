@@ -40,7 +40,15 @@ object CatalogSeed {
         BadgeEntity(0, "BADGE_BUDGET_WIZARD", "Mago del Presupuesto", "Buenos servicios gastando poco presupuesto.", "ic_badge_budget", "GENERAL"),
         BadgeEntity(0, "BADGE_MISSION_10", "Explorador Urbano", "Completaste 10 misiones.", "ic_badge_missions10", "GENERAL"),
         BadgeEntity(0, "BADGE_MISSION_20", "Planificador Experto", "Completaste 20 misiones.", "ic_badge_missions20", "GENERAL"),
-        BadgeEntity(0, "BADGE_XP_500", "Leyenda de la Ciudad", "Alcanzaste 500 puntos de experiencia.", "ic_badge_xp", "GENERAL")
+        BadgeEntity(0, "BADGE_XP_500", "Leyenda de la Ciudad", "Alcanzaste 500 puntos de experiencia.", "ic_badge_xp", "GENERAL"),
+        BadgeEntity(0, "BADGE_LEVEL1_MASTER", "Fundamentos Dominados", "Completaste todas las misiones del Nivel 1.", "ic_badge_level1", "GENERAL"),
+        BadgeEntity(0, "BADGE_LEVEL2_MASTER", "Maestro de Conexiones", "Completaste todas las misiones del Nivel 2 y desbloqueaste el Modo Libre.", "ic_badge_level2", "GENERAL"),
+        BadgeEntity(0, "BADGE_LEVEL3_MASTER", "Solucionador Experto", "Completaste todas las misiones del Nivel 3.", "ic_badge_level3", "GENERAL"),
+        BadgeEntity(0, "BADGE_GRAND_MASTER", "Alcalde de Mérito", "Completaste los 4 niveles de misiones: eres el mejor alcalde.", "ic_badge_grandmaster", "GENERAL"),
+        BadgeEntity(0, "BADGE_TRANSPORT_MASTER", "Maestro del Transporte", "Construiste una gran red de autobuses y trenes.", "ic_badge_transport", "TRANSPORT"),
+        BadgeEntity(0, "BADGE_MEGA_CITY", "Ciudad en Expansión", "Completaste 50 misiones.", "ic_badge_megacity", "GENERAL"),
+        BadgeEntity(0, "BADGE_PERFECT_CITY", "Ciudad Perfecta", "Alcanzaste movilidad, servicios y verde altísimos a la vez.", "ic_badge_perfect", "GENERAL"),
+        BadgeEntity(0, "BADGE_BUDGET_GENIUS", "Genio del Presupuesto", "Excelentes servicios gastando muy poco presupuesto.", "ic_badge_geniusbudget", "GENERAL")
     )
 
     fun decorations(): List<DecorationEntity> = listOf(

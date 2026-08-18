@@ -1,7 +1,9 @@
 package com.educalab.atumanera.data.repository
 
 import com.educalab.atumanera.data.local.AppDatabase
+import com.educalab.atumanera.data.local.entity.CityEntity
 import com.educalab.atumanera.data.local.entity.CityMetricEntity
+import com.educalab.atumanera.data.local.entity.CityTileEntity
 import com.educalab.atumanera.data.local.entity.MissionProgressEntity
 import com.educalab.atumanera.data.local.entity.PlacedInfrastructureEntity
 import com.educalab.atumanera.data.local.entity.ProgressEntity
@@ -26,7 +28,12 @@ import com.educalab.atumanera.domain.model.TileSnapshot
 
 /** Resultado de intentar colocar una infraestructura sobre la cuadrícula. */
 sealed class PlacementOutcome {
-    data class Success(val metrics: CityMetricsSnapshot, val newlyCompletedMissions: List<String>, val newBadges: List<String>) : PlacementOutcome()
+    data class Success(
+        val metrics: CityMetricsSnapshot,
+        val newlyCompletedMissions: List<String>,
+        val newBadges: List<String>,
+        val newlyCompletedLevels: List<Int> = emptyList()
+    ) : PlacementOutcome()
     object TileOccupied : PlacementOutcome()
     object TileNotFound : PlacementOutcome()
     object InsufficientBudget : PlacementOutcome()
@@ -60,6 +67,10 @@ class CityRepository(private val db: AppDatabase) {
         private const val LEVEL_2_BUDGET_BONUS = 3000
         private const val LEVEL_3_BUDGET_BONUS = 4500
         private const val LEVEL_4_BUDGET_BONUS = 6000
+
+        /** Nombre reservado que identifica la ciudad de Modo Libre (evita tocar el esquema de Room). */
+        const val FREE_MODE_CITY_NAME = "Modo Libre"
+        private const val FREE_MODE_BUDGET = 999_999_999
     }
 
     // ---------- Lectura de estado ----------
@@ -91,6 +102,7 @@ class CityRepository(private val db: AppDatabase) {
 
     fun observeUserFlow() = db.userProfileDao().observeFirst()
     fun observeCityFlow(userId: Long) = db.cityDao().observeLatestForUser(userId)
+    fun observeFreeCityFlow(userId: Long) = db.cityDao().observeFreeCityForUser(userId)
     fun observeMetricsHistory(cityId: Long) = db.cityMetricDao().observeHistory(cityId)
     fun observeMissionProgress(userId: Long, cityId: Long) = db.missionProgressDao().observeForCity(userId, cityId)
     fun observeMissions() = db.missionDao().observeAll()
@@ -163,6 +175,66 @@ class CityRepository(private val db: AppDatabase) {
             db.roadConnectionDao().clearCity(cityId)
         }
         return finalizeCityUpdate(userId, cityId)
+    }
+
+    // ---------- Modo Libre: ciudad aparte, sin presupuesto ni misiones ----------
+    // Se identifica por su nombre ("Modo Libre") para no requerir cambios de
+    // esquema en Room. Construir ahí nunca evalúa misiones, insignias ni
+    // historial de métricas: es un espacio de juego libre y separado.
+
+    /** Crea (si no existe) la ciudad de Modo Libre del usuario y la devuelve. */
+    suspend fun ensureFreeCity(userId: Long, rows: Int, cols: Int): CityEntity {
+        db.cityDao().getFreeCityForUser(userId)?.let { return it }
+        val now = System.currentTimeMillis()
+        val cityId = db.cityDao().insert(
+            CityEntity(0, userId, FREE_MODE_CITY_NAME, FREE_MODE_BUDGET, rows, cols, now, now)
+        )
+        val tiles = mutableListOf<CityTileEntity>()
+        for (r in 0 until rows) {
+            for (c in 0 until cols) {
+                tiles.add(CityTileEntity(0, cityId, r, c, true))
+            }
+        }
+        db.cityTileDao().insertAll(tiles)
+        return db.cityDao().getById(cityId)!!
+    }
+
+    suspend fun placeInfrastructureFree(cityId: Long, row: Int, col: Int, infrastructureTypeId: Long): PlacementOutcome {
+        val city = db.cityDao().getById(cityId) ?: return PlacementOutcome.TileNotFound
+        val tile = db.cityTileDao().getTileAt(cityId, row, col) ?: return PlacementOutcome.TileNotFound
+        val existing = db.placedInfrastructureDao().getAt(cityId, tile.id)
+        if (existing != null) return PlacementOutcome.TileOccupied
+        val infraType = db.infrastructureTypeDao().getById(infrastructureTypeId) ?: return PlacementOutcome.TileNotFound
+
+        db.placedInfrastructureDao().insert(
+            PlacedInfrastructureEntity(0, cityId, tile.id, infrastructureTypeId, System.currentTimeMillis())
+        )
+        if (infraType.category == InfraCategory.ROAD.name) {
+            linkRoadNeighbors(city.rows, city.cols, cityId, tile.id, row, col)
+        }
+        return PlacementOutcome.Success(currentMetrics(cityId), emptyList(), emptyList())
+    }
+
+    suspend fun removeInfrastructureFree(cityId: Long, row: Int, col: Int): RemovalOutcome {
+        val tile = db.cityTileDao().getTileAt(cityId, row, col) ?: return RemovalOutcome.NothingToRemove
+        val existing = db.placedInfrastructureDao().getAt(cityId, tile.id) ?: return RemovalOutcome.NothingToRemove
+        db.placedInfrastructureDao().removeAt(cityId, tile.id)
+        db.roadConnectionDao().removeInvolvingTile(cityId, tile.id)
+        return RemovalOutcome.Success(currentMetrics(cityId))
+    }
+
+    suspend fun clearCityFree(cityId: Long): PlacementOutcome.Success {
+        db.placedInfrastructureDao().clearCity(cityId)
+        db.roadConnectionDao().clearCity(cityId)
+        return PlacementOutcome.Success(currentMetrics(cityId), emptyList(), emptyList())
+    }
+
+    suspend fun clearCategoryFree(cityId: Long, category: InfraCategory): PlacementOutcome.Success {
+        db.placedInfrastructureDao().clearCategory(cityId, category.name)
+        if (category == InfraCategory.ROAD) {
+            db.roadConnectionDao().clearCity(cityId)
+        }
+        return PlacementOutcome.Success(currentMetrics(cityId), emptyList(), emptyList())
     }
 
     private suspend fun linkRoadNeighbors(rows: Int, cols: Int, cityId: Long, tileId: Long, row: Int, col: Int) {
@@ -297,23 +369,33 @@ class CityRepository(private val db: AppDatabase) {
             return idsInLevel.isNotEmpty() && idsInLevel.all { it in completedMissionIds }
         }
 
+        val level1Complete = levelComplete(LEVEL_1_RANGE)
+        val level2Complete = levelComplete(LEVEL_2_RANGE)
+        val level3Complete = levelComplete(LEVEL_3_RANGE)
+        val level4Complete = levelComplete(LEVEL_4_RANGE)
+
         var currentChapter = progress.currentChapter
         var budgetTotal = city.budgetTotal
-        if (currentChapter <= 1 && levelComplete(LEVEL_1_RANGE)) {
+        val newlyCompletedLevels = mutableListOf<Int>()
+        if (currentChapter <= 1 && level1Complete) {
             budgetTotal += LEVEL_1_BUDGET_BONUS
             currentChapter = 2
+            newlyCompletedLevels.add(1)
         }
-        if (currentChapter <= 2 && levelComplete(LEVEL_2_RANGE)) {
+        if (currentChapter <= 2 && level2Complete) {
             budgetTotal += LEVEL_2_BUDGET_BONUS
             currentChapter = 3
+            newlyCompletedLevels.add(2)
         }
-        if (currentChapter <= 3 && levelComplete(LEVEL_3_RANGE)) {
+        if (currentChapter <= 3 && level3Complete) {
             budgetTotal += LEVEL_3_BUDGET_BONUS
             currentChapter = 4
+            newlyCompletedLevels.add(3)
         }
-        if (currentChapter <= 4 && levelComplete(LEVEL_4_RANGE)) {
+        if (currentChapter <= 4 && level4Complete) {
             budgetTotal += LEVEL_4_BUDGET_BONUS
             currentChapter = 5
+            newlyCompletedLevels.add(4)
         }
         if (budgetTotal != city.budgetTotal) {
             db.cityDao().update(city.copy(budgetTotal = budgetTotal, updatedAt = System.currentTimeMillis()))
@@ -324,7 +406,7 @@ class CityRepository(private val db: AppDatabase) {
         )
 
         // Evaluar insignias y decoraciones desbloqueables.
-        val unlockContext = UnlockContext(totalXp, missionsCompleted, metrics, placedCounts)
+        val unlockContext = UnlockContext(totalXp, missionsCompleted, metrics, placedCounts, level1Complete, level2Complete, level3Complete, level4Complete)
         val newBadgeCodes = mutableListOf<String>()
         val earnedBadgeIds = db.userBadgeDao().getEarnedBadgeIds(userId).toSet()
         for (badgeCode in unlockEvaluator.evaluateBadges(unlockContext, UnlockEvaluator.defaultBadgeConditions())) {
@@ -343,6 +425,6 @@ class CityRepository(private val db: AppDatabase) {
             }
         }
 
-        return PlacementOutcome.Success(metrics, newlyCompleted, newBadgeCodes)
+        return PlacementOutcome.Success(metrics, newlyCompleted, newBadgeCodes, newlyCompletedLevels)
     }
 }

@@ -22,7 +22,9 @@ data class MissionUiItem(
 data class MissionsUiState(
     val items: List<MissionUiItem> = emptyList(),
     val totalXp: Int = 0,
-    val missionsCompleted: Int = 0
+    val missionsCompleted: Int = 0,
+    /** 1 = nivel 1 en curso, 2 = nivel 1 completado, 3 = nivel 2 completado (Modo Libre desbloqueado), etc. */
+    val currentChapter: Int = 1
 )
 
 class MissionsViewModel(private val repository: CityRepository) : ViewModel() {
@@ -51,7 +53,7 @@ class MissionsViewModel(private val repository: CityRepository) : ViewModel() {
                     }
                     MissionUiItem(mission, status, p?.progressPercent ?: 0)
                 }
-                MissionsUiState(items, progress?.totalXp ?: 0, progress?.missionsCompleted ?: 0)
+                MissionsUiState(items, progress?.totalXp ?: 0, progress?.missionsCompleted ?: 0, progress?.currentChapter ?: 1)
             }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), MissionsUiState())

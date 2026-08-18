@@ -46,11 +46,17 @@ interface CityDao {
     @Update
     suspend fun update(city: CityEntity)
 
-    @Query("SELECT * FROM city WHERE userId = :userId ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM city WHERE userId = :userId AND name != 'Modo Libre' ORDER BY id DESC LIMIT 1")
     fun observeLatestForUser(userId: Long): Flow<CityEntity?>
 
-    @Query("SELECT * FROM city WHERE userId = :userId ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM city WHERE userId = :userId AND name != 'Modo Libre' ORDER BY id DESC LIMIT 1")
     suspend fun getLatestForUser(userId: Long): CityEntity?
+
+    @Query("SELECT * FROM city WHERE userId = :userId AND name = 'Modo Libre' ORDER BY id DESC LIMIT 1")
+    fun observeFreeCityForUser(userId: Long): Flow<CityEntity?>
+
+    @Query("SELECT * FROM city WHERE userId = :userId AND name = 'Modo Libre' ORDER BY id DESC LIMIT 1")
+    suspend fun getFreeCityForUser(userId: Long): CityEntity?
 
     @Query("SELECT * FROM city WHERE id = :id")
     suspend fun getById(id: Long): CityEntity?

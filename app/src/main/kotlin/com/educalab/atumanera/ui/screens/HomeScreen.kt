@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -70,6 +71,7 @@ fun HomeScreen(
     cityViewModel: CityViewModel,
     missionsViewModel: MissionsViewModel,
     onOpenBuild: (InfraCategory) -> Unit,
+    onOpenFreeMode: () -> Unit,
     onOpenMissions: () -> Unit,
     onOpenIndicators: () -> Unit,
     onOpenSettings: () -> Unit
@@ -168,6 +170,28 @@ fun HomeScreen(
                             Column(Modifier.weight(1f)) {
                                 Text("Siguiente misión", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(nextMission.mission.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (missionsState.currentChapter >= 3) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clickable { onOpenFreeMode() },
+                        shape = RoundedCornerShape(18.dp),
+                        colors = CardDefaults.cardColors(containerColor = BlueprintBlue)
+                    ) {
+                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Star, contentDescription = null, tint = SunAmber, modifier = Modifier.size(32.dp))
+                            Spacer(Modifier.size(12.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text("Modo Libre desbloqueado", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = androidx.compose.ui.graphics.Color.White)
+                                Text("Construye lo que quieras, sin presupuesto", style = MaterialTheme.typography.bodySmall, color = SkyBlueSoft)
                             }
                         }
                     }

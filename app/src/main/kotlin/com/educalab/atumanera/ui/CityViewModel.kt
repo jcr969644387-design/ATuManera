@@ -11,7 +11,8 @@ import com.educalab.atumanera.data.local.entity.PlacedInfrastructureEntity
 import com.educalab.atumanera.data.local.entity.UserProfileEntity
 import com.educalab.atumanera.data.repository.CityRepository
 import com.educalab.atumanera.data.repository.PlacementOutcome
-import com.educalab.atumanera.data.repository.RemovalOutcome
+import com.educalab.atumanera.data.seed.DEFAULT_CITY_COLS
+import com.educalab.atumanera.data.seed.DEFAULT_CITY_ROWS
 import com.educalab.atumanera.domain.model.InfraCategory
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,8 +20,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -46,14 +47,33 @@ sealed class CityEvent {
     object Removed : CityEvent()
     data class MissionsCompleted(val codes: List<String>) : CityEvent()
     data class BadgesEarned(val codes: List<String>) : CityEvent()
+    data class LevelCompleted(val level: Int) : CityEvent()
     data class Rejected(val reason: String) : CityEvent()
 }
 
-class CityViewModel(private val repository: CityRepository) : ViewModel() {
+/**
+ * @param freeMode si es true, este ViewModel opera sobre la ciudad de Modo
+ * Libre (presupuesto prácticamente ilimitado, sin misiones ni insignias) en
+ * lugar de la ciudad principal ligada a las misiones.
+ */
+class CityViewModel(
+    private val repository: CityRepository,
+    private val freeMode: Boolean = false
+) : ViewModel() {
 
     private val user = repository.observeUserFlow()
     private val cityFlow = user.flatMapLatest { u ->
-        if (u == null) kotlinx.coroutines.flow.flowOf(null) else repository.observeCityFlow(u.id)
+        if (u == null) kotlinx.coroutines.flow.flowOf(null)
+        else if (freeMode) repository.observeFreeCityFlow(u.id) else repository.observeCityFlow(u.id)
+    }
+
+    init {
+        if (freeMode) {
+            viewModelScope.launch {
+                val u = user.filterNotNull().first()
+                repository.ensureFreeCity(u.id, DEFAULT_CITY_ROWS, DEFAULT_CITY_COLS)
+            }
+        }
     }
 
     private val tilesAndPlacements = cityFlow.filterNotNull().flatMapLatest { city ->
@@ -94,11 +114,17 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         val u = state.value.user ?: return
         val city = state.value.city ?: return
         viewModelScope.launch {
-            when (val outcome = repository.placeInfrastructure(u.id, city.id, row, col, infrastructureTypeId)) {
+            val outcome = if (freeMode) {
+                repository.placeInfrastructureFree(city.id, row, col, infrastructureTypeId)
+            } else {
+                repository.placeInfrastructure(u.id, city.id, row, col, infrastructureTypeId)
+            }
+            when (outcome) {
                 is PlacementOutcome.Success -> {
                     _events.tryEmit(CityEvent.Placed)
                     if (outcome.newlyCompletedMissions.isNotEmpty()) _events.tryEmit(CityEvent.MissionsCompleted(outcome.newlyCompletedMissions))
                     if (outcome.newBadges.isNotEmpty()) _events.tryEmit(CityEvent.BadgesEarned(outcome.newBadges))
+                    outcome.newlyCompletedLevels.forEach { level -> _events.tryEmit(CityEvent.LevelCompleted(level)) }
                 }
                 PlacementOutcome.InsufficientBudget -> _events.tryEmit(CityEvent.Rejected("No tienes presupuesto suficiente para esta construcción."))
                 PlacementOutcome.TileOccupied -> _events.tryEmit(CityEvent.Rejected("Esa casilla ya tiene una construcción."))
@@ -111,7 +137,8 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         val u = state.value.user ?: return
         val city = state.value.city ?: return
         viewModelScope.launch {
-            repository.removeInfrastructure(u.id, city.id, row, col)
+            if (freeMode) repository.removeInfrastructureFree(city.id, row, col)
+            else repository.removeInfrastructure(u.id, city.id, row, col)
             _events.tryEmit(CityEvent.Removed)
         }
     }
@@ -120,7 +147,7 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         val u = state.value.user ?: return
         val city = state.value.city ?: return
         viewModelScope.launch {
-            repository.clearCity(u.id, city.id)
+            if (freeMode) repository.clearCityFree(city.id) else repository.clearCity(u.id, city.id)
             _events.tryEmit(CityEvent.Removed)
         }
     }
@@ -129,7 +156,7 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         val u = state.value.user ?: return
         val city = state.value.city ?: return
         viewModelScope.launch {
-            repository.clearCategory(u.id, city.id, category)
+            if (freeMode) repository.clearCategoryFree(city.id, category) else repository.clearCategory(u.id, city.id, category)
             _events.tryEmit(CityEvent.Removed)
         }
     }
@@ -142,11 +169,14 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
     }
 }
 
-class CityViewModelFactory(private val repository: CityRepository) : ViewModelProvider.Factory {
+class CityViewModelFactory(
+    private val repository: CityRepository,
+    private val freeMode: Boolean = false
+) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CityViewModel::class.java)) {
-            return CityViewModel(repository) as T
+            return CityViewModel(repository, freeMode) as T
         }
         throw IllegalArgumentException("ViewModel desconocido: $modelClass")
     }

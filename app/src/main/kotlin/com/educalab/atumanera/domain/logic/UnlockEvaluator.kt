@@ -13,7 +13,11 @@ data class UnlockContext(
     val totalXp: Int,
     val missionsCompleted: Int,
     val metrics: CityMetricsSnapshot,
-    val placedCounts: Map<String, Int>
+    val placedCounts: Map<String, Int>,
+    val level1Complete: Boolean = false,
+    val level2Complete: Boolean = false,
+    val level3Complete: Boolean = false,
+    val level4Complete: Boolean = false
 )
 
 /**
@@ -43,7 +47,15 @@ class UnlockEvaluator {
             UnlockCondition("BADGE_BUDGET_WIZARD") { it.metrics.budgetUsedPercent in 1..70 && it.metrics.servicesScore >= 60 },
             UnlockCondition("BADGE_MISSION_10") { it.missionsCompleted >= 10 },
             UnlockCondition("BADGE_MISSION_20") { it.missionsCompleted >= 20 },
-            UnlockCondition("BADGE_XP_500") { it.totalXp >= 500 }
+            UnlockCondition("BADGE_XP_500") { it.totalXp >= 500 },
+            UnlockCondition("BADGE_LEVEL1_MASTER") { it.level1Complete },
+            UnlockCondition("BADGE_LEVEL2_MASTER") { it.level2Complete },
+            UnlockCondition("BADGE_LEVEL3_MASTER") { it.level3Complete },
+            UnlockCondition("BADGE_GRAND_MASTER") { it.level4Complete },
+            UnlockCondition("BADGE_TRANSPORT_MASTER") { (it.placedCounts["BUS_STOP"] ?: 0) >= 3 && (it.placedCounts["TRAIN_STATION"] ?: 0) >= 2 },
+            UnlockCondition("BADGE_MEGA_CITY") { it.missionsCompleted >= 50 },
+            UnlockCondition("BADGE_PERFECT_CITY") { it.metrics.mobility >= 90 && it.metrics.servicesScore >= 85 && it.metrics.greenScore >= 80 },
+            UnlockCondition("BADGE_BUDGET_GENIUS") { it.metrics.budgetUsedPercent in 1..50 && it.metrics.servicesScore >= 70 }
         )
 
         /** Catálogo de condiciones estándar de monumentos decorativos. */

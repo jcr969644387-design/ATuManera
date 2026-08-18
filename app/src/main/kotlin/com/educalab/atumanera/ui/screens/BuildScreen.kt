@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.AlertDialog
@@ -89,11 +90,13 @@ fun BuildScreen(
     missionsViewModel: MissionsViewModel,
     preferences: AppPreferences,
     onBack: () -> Unit,
-    onOpenMissions: () -> Unit
+    onOpenMissions: () -> Unit,
+    freeMode: Boolean = false
 ) {
     val state by viewModel.state.collectAsState()
     val missionsState by missionsViewModel.state.collectAsState()
-    val nextMission = missionsState.items.firstOrNull { it.status == MissionStatus.AVAILABLE || it.status == MissionStatus.IN_PROGRESS }
+    val nextMission = if (freeMode) null else missionsState.items.firstOrNull { it.status == MissionStatus.AVAILABLE || it.status == MissionStatus.IN_PROGRESS }
+    var levelCelebration by remember { mutableStateOf<Int?>(null) }
     var currentCategory by remember { mutableStateOf(category) }
     val visual = categoryVisual(currentCategory)
     val context = LocalContext.current
@@ -117,6 +120,7 @@ fun BuildScreen(
             when (event) {
                 is CityEvent.MissionsCompleted -> feedback = "¡Misión completada! Sigue así."
                 is CityEvent.BadgesEarned -> feedback = "¡Nueva insignia desbloqueada!"
+                is CityEvent.LevelCompleted -> levelCelebration = event.level
                 is CityEvent.Rejected -> feedback = event.reason
                 CityEvent.Placed, CityEvent.Removed -> Unit
             }
@@ -129,7 +133,7 @@ fun BuildScreen(
             if (preferences.soundEnabled) {
                 when (event) {
                     is CityEvent.Rejected -> SoundFeedback.playReject()
-                    is CityEvent.MissionsCompleted, is CityEvent.BadgesEarned -> SoundFeedback.playSuccess()
+                    is CityEvent.MissionsCompleted, is CityEvent.BadgesEarned, is CityEvent.LevelCompleted -> SoundFeedback.playSuccess()
                     else -> SoundFeedback.playBuild()
                 }
             }
@@ -143,15 +147,19 @@ fun BuildScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ScreenTopBar(
-                    title = visual.label,
-                    subtitle = "Elige un módulo y toca una casilla libre para construir",
+                    title = if (freeMode) "${visual.label} · Modo Libre" else visual.label,
+                    subtitle = if (freeMode) "Construye lo que quieras, sin límite de presupuesto" else "Elige un módulo y toca una casilla libre para construir",
                     onBack = onBack
                 )
 
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    val spent = state.latestMetric?.budgetSpent ?: 0
-                    val total = state.city?.budgetTotal ?: 0
-                    StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
+                    if (freeMode) {
+                        StatPill("Presupuesto", "Ilimitado ∞", visual.color, Modifier.weight(1f))
+                    } else {
+                        val spent = state.latestMetric?.budgetSpent ?: 0
+                        val total = state.city?.budgetTotal ?: 0
+                        StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
+                    }
                 }
 
                 if (nextMission != null) {
@@ -358,6 +366,33 @@ fun BuildScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmClearAll = false }) { Text("Cancelar") }
+            }
+        )
+    }
+
+    levelCelebration?.let { level ->
+        AlertDialog(
+            onDismissRequest = { levelCelebration = null },
+            icon = {
+                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    repeat(level) {
+                        Icon(Icons.Filled.Star, contentDescription = null, tint = com.educalab.atumanera.ui.theme.SunAmber, modifier = Modifier.size(28.dp))
+                    }
+                }
+            },
+            title = { Text(if (level < 4) "¡Nivel $level completado!" else "¡Completaste los 4 niveles!") },
+            text = {
+                Text(
+                    when (level) {
+                        1 -> "¡Muy bien! Dominaste los fundamentos de tu ciudad. Avanzas al Nivel 2: ahora tendrás que pensar dónde construir cada cosa."
+                        2 -> "¡Excelente! Aprendiste a conectar tu ciudad. Avanzas al Nivel 3, con retos de verdad. Además, acabas de desbloquear el Modo Libre: podrás construir lo que quieras sin presupuesto desde el mapa principal."
+                        3 -> "¡Impresionante! Resolviste los problemas del Nivel 3. Avanzas al Nivel 4, el más difícil: ahí tendrás que decidir qué opción es mejor y por qué."
+                        else -> "¡Felicidades! Completaste los 4 niveles de misiones. Ganaste la insignia \"Alcalde de Mérito\": eres el mejor alcalde de la ciudad."
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { levelCelebration = null }) { Text("¡Genial!") }
             }
         )
     }
