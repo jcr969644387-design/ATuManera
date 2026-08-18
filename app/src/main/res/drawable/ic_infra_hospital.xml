@@ -3,7 +3,20 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#C7362F" android:pathData="M24,12 L84,12 Q96,12 96,24 L96,84 Q96,96 84,96 L24,96 Q12,96 12,84 L12,24 Q12,12 24,12 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M44,26 L64,26 L64,82 L44,82 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M26,44 L82,44 L82,64 L26,64 Z"/>
+    <!-- Cuerpo principal -->
+    <path android:fillColor="#F6C9C4" android:pathData="M16,30 L92,30 L92,92 L16,92 Z"/>
+    <!-- Franja superior con cruz -->
+    <path android:fillColor="#C7362F" android:pathData="M16,16 L92,16 Q96,16 96,20 L96,30 L12,30 L12,20 Q12,16 16,16 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M50,4 L58,4 L58,20 L50,20 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M46,8 L62,8 L62,16 L46,16 Z"/>
+    <!-- Ventanas: 2 filas -->
+    <path android:fillColor="#BFE6F5" android:pathData="M24,38 L36,38 L36,50 L24,50 Z"/>
+    <path android:fillColor="#BFE6F5" android:pathData="M45,38 L57,38 L57,50 L45,50 Z"/>
+    <path android:fillColor="#BFE6F5" android:pathData="M72,38 L84,38 L84,50 L72,50 Z"/>
+    <path android:fillColor="#BFE6F5" android:pathData="M24,58 L36,58 L36,70 L24,70 Z"/>
+    <path android:fillColor="#BFE6F5" android:pathData="M72,58 L84,58 L84,70 L72,70 Z"/>
+    <!-- Entrada de urgencias -->
+    <path android:fillColor="#FFFFFF" android:pathData="M44,58 L64,58 L64,92 L44,92 Z"/>
+    <path android:fillColor="#C7362F" android:pathData="M44,72 L64,72 L64,76 L44,76 Z"/>
+    <path android:fillColor="#7C8894" android:pathData="M53,58 L55,58 L55,92 L53,92 Z"/>
 </vector>

@@ -3,8 +3,20 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#8B6FE0" android:pathData="M20,24 L36,24 L36,88 L20,88 Z"/>
-    <path android:fillColor="#A48CEA" android:pathData="M38,30 L54,30 L54,88 L38,88 Z"/>
-    <path android:fillColor="#8B6FE0" android:pathData="M56,24 L72,24 L72,88 L56,88 Z"/>
-    <path android:fillColor="#A48CEA" android:pathData="M74,34 L88,34 L88,88 L74,88 Z"/>
+    <!-- Frontón triangular -->
+    <path android:fillColor="#8B6FE0" android:pathData="M54,10 L88,28 L20,28 Z"/>
+    <!-- Cornisa -->
+    <path android:fillColor="#6E52C0" android:pathData="M16,28 L92,28 L92,36 L16,36 Z"/>
+    <!-- Cuerpo -->
+    <path android:fillColor="#A48CEA" android:pathData="M22,36 L86,36 L86,88 L22,88 Z"/>
+    <!-- Columnas -->
+    <path android:fillColor="#FFFFFF" android:pathData="M27,40 L34,40 L34,84 L27,84 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M50,40 L58,40 L58,84 L50,84 Z"/>
+    <path android:fillColor="#FFFFFF" android:pathData="M74,40 L81,40 L81,84 L74,84 Z"/>
+    <!-- Libro abierto sobre la entrada -->
+    <path android:fillColor="#FFF3E4" android:pathData="M42,58 L54,62 L54,74 L42,70 Z"/>
+    <path android:fillColor="#FFF3E4" android:pathData="M66,58 L54,62 L54,74 L66,70 Z"/>
+    <path android:fillColor="#4B2E83" android:pathData="M53,61 L55,61 L55,73 L53,73 Z"/>
+    <!-- Escalones -->
+    <path android:fillColor="#6E52C0" android:pathData="M18,88 L90,88 L90,94 L18,94 Z"/>
 </vector>

@@ -3,6 +3,18 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#57B15F" android:pathData="M28.0,40 a26,26 0 1,0 52,0 a26,26 0 1,0 -52,0 Z"/>
-    <path android:fillColor="#7C4A3D" android:pathData="M48,60 L60,60 L60,90 L48,90 Z"/>
+    <!-- Árbol pequeño -->
+    <path android:fillColor="#7C4A3D" android:pathData="M17,72 L23,72 L23,90 L17,90 Z"/>
+    <path android:fillColor="#7FC98A" android:pathData="M7,56 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 Z"/>
+    <!-- Árbol grande -->
+    <path android:fillColor="#7C4A3D" android:pathData="M48,66 L58,66 L58,92 L48,92 Z"/>
+    <path android:fillColor="#57B15F" android:pathData="M29,46 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0 Z"/>
+    <!-- Banca -->
+    <path android:fillColor="#C68A4E" android:pathData="M68,74 L94,74 L94,80 L68,80 Z"/>
+    <path android:fillColor="#7C4A3D" android:pathData="M70,80 L74,80 L74,92 L70,92 Z"/>
+    <path android:fillColor="#7C4A3D" android:pathData="M88,80 L92,80 L92,92 L88,92 Z"/>
+    <!-- Flores -->
+    <path android:fillColor="#EF6F6C" android:pathData="M38,94 a2.4,2.4 0 1,0 4.8,0 a2.4,2.4 0 1,0 -4.8,0 Z"/>
+    <path android:fillColor="#F6A623" android:pathData="M46,96 a2.4,2.4 0 1,0 4.8,0 a2.4,2.4 0 1,0 -4.8,0 Z"/>
+    <path android:fillColor="#D65DA8" android:pathData="M54,94 a2.4,2.4 0 1,0 4.8,0 a2.4,2.4 0 1,0 -4.8,0 Z"/>
 </vector>

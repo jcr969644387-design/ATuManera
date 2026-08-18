@@ -3,8 +3,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#57B15F" android:pathData="M14,38 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
-    <path android:fillColor="#4CA057" android:pathData="M42,30 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0 Z"/>
-    <path android:fillColor="#57B15F" android:pathData="M64,46 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z"/>
-    <path android:fillColor="#7C4A3D" android:pathData="M48,56 L60,56 L60,90 L48,90 Z"/>
+    <!-- Estanque -->
+    <path android:fillColor="#7EC8E3" android:pathData="M24,86 a30,11 0 1,0 60,0 a30,11 0 1,0 -60,0 Z"/>
+    <path android:fillColor="#A7DCEF" android:pathData="M34,86 a20,5 0 1,0 40,0 a20,5 0 1,0 -40,0 Z"/>
+    <!-- Árbol izquierdo -->
+    <path android:fillColor="#7C4A3D" android:pathData="M14,62 L20,62 L20,84 L14,84 Z"/>
+    <path android:fillColor="#7FC98A" android:pathData="M2,34 a15,15 0 1,0 30,0 a15,15 0 1,0 -30,0 Z"/>
+    <!-- Árbol central -->
+    <path android:fillColor="#7C4A3D" android:pathData="M48,54 L58,54 L58,82 L48,82 Z"/>
+    <path android:fillColor="#4CA057" android:pathData="M33,14 a20,20 0 1,0 40,0 a20,20 0 1,0 -40,0 Z"/>
+    <path android:fillColor="#57B15F" android:pathData="M25,32 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0 Z"/>
+    <!-- Árbol derecho -->
+    <path android:fillColor="#7C4A3D" android:pathData="M82,58 L90,58 L90,84 L82,84 Z"/>
+    <path android:fillColor="#57B15F" android:pathData="M72,30 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z"/>
 </vector>

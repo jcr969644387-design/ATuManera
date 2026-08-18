@@ -1,6 +1,5 @@
 package com.educalab.atumanera.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
@@ -42,8 +41,12 @@ val AtuManeraTypography = Typography(
     labelMedium = TextStyle(fontWeight = FontWeight.SemiBold, fontSize = 12.sp, lineHeight = 16.sp)
 )
 
+/**
+ * La app siempre usa esta paleta clara fija: no sigue el modo claro/oscuro
+ * del sistema para que los colores no cambien según el teléfono del niño.
+ */
 @Composable
-fun ATuManeraTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun ATuManeraTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = AtuManeraColorScheme,
         typography = AtuManeraTypography,

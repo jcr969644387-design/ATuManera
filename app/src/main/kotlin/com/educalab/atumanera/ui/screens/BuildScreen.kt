@@ -96,6 +96,7 @@ fun BuildScreen(
     var feedback by remember { mutableStateOf<String?>(null) }
     var pendingDelete by remember { mutableStateOf<Triple<Int, Int, String>?>(null) }
     var confirmClearAll by remember { mutableStateOf(false) }
+    var confirmClearCategory by remember { mutableStateOf(false) }
     var zoom by remember { mutableFloatStateOf(ZOOM_MIN) }
 
     val catalogForCategory = state.catalog.filter { it.category == currentCategory.name }
@@ -158,13 +159,27 @@ fun BuildScreen(
                         )
                     }
                 }
-
                 Text(
-                    "Elige qué construir",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    "Más módulos para elegir →",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Elige qué construir",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { confirmClearCategory = true }) {
+                        Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar solo ${visual.label}")
+                    }
+                }
 
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -274,6 +289,24 @@ fun BuildScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingDelete = null }) { Text("Cancelar") }
+            }
+        )
+    }
+
+    if (confirmClearCategory) {
+        AlertDialog(
+            onDismissRequest = { confirmClearCategory = false },
+            icon = { Icon(Icons.Filled.DeleteSweep, contentDescription = null) },
+            title = { Text("¿Eliminar todo de ${visual.label}?") },
+            text = { Text("Vas a borrar solo las construcciones de ${visual.label} de tu ciudad. Recuperarás el presupuesto invertido en ellas, pero esta acción no se puede deshacer.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.clearCategory(currentCategory)
+                    confirmClearCategory = false
+                }) { Text("Eliminar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmClearCategory = false }) { Text("Cancelar") }
             }
         )
     }

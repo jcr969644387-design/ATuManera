@@ -142,6 +142,15 @@ class CityRepository(private val db: AppDatabase) {
         return finalizeCityUpdate(userId, cityId)
     }
 
+    /** Elimina únicamente las construcciones de una categoría (p. ej. solo las calles). */
+    suspend fun clearCategory(userId: Long, cityId: Long, category: InfraCategory): PlacementOutcome.Success {
+        db.placedInfrastructureDao().clearCategory(cityId, category.name)
+        if (category == InfraCategory.ROAD) {
+            db.roadConnectionDao().clearCity(cityId)
+        }
+        return finalizeCityUpdate(userId, cityId)
+    }
+
     private suspend fun linkRoadNeighbors(rows: Int, cols: Int, cityId: Long, tileId: Long, row: Int, col: Int) {
         val neighborOffsets = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         val connections = mutableListOf<RoadConnectionEntity>()

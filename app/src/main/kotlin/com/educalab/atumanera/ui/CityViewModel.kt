@@ -125,6 +125,15 @@ class CityViewModel(private val repository: CityRepository) : ViewModel() {
         }
     }
 
+    fun clearCategory(category: InfraCategory) {
+        val u = state.value.user ?: return
+        val city = state.value.city ?: return
+        viewModelScope.launch {
+            repository.clearCategory(u.id, city.id, category)
+            _events.tryEmit(CityEvent.Removed)
+        }
+    }
+
     fun updateProfile(alias: String, avatarCode: String) {
         val u = state.value.user ?: return
         viewModelScope.launch {

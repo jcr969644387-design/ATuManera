@@ -21,6 +21,17 @@ fun categoryVisual(category: InfraCategory): CategoryVisual = when (category) {
     InfraCategory.TRANSPORT -> CategoryVisual("Transporte", Color(0xFFE08A3C), Color(0xFFFCE8D3), R.drawable.ic_module_transport)
 }
 
+/** Qué es cada módulo y cómo se conecta con los demás, para mostrar antes de construir. */
+fun moduleInfo(category: InfraCategory): String = when (category) {
+    InfraCategory.ROAD -> "Las calles son la base de tu ciudad: sin ellas, ninguna casa ni servicio puede conectarse entre sí. Constrúyelas una junto a otra para formar una sola red. Todas las viviendas y servicios necesitan una calle justo al lado para funcionar."
+    InfraCategory.HOUSING -> "Aquí viven los habitantes de tu ciudad. Cada casa necesita una calle junto a ella para tener movilidad y poder recibir educación, salud y agua. Sin conexión a la red de calles, la casa no cuenta para ningún indicador."
+    InfraCategory.EDUCATION -> "Escuelas y bibliotecas dan cobertura educativa a las casas cercanas. Para que funcionen, deben estar conectadas por calle a la MISMA red que las viviendas, y dentro de su radio de alcance."
+    InfraCategory.HEALTH -> "Centros de salud y hospitales cuidan a tus vecinos. Igual que educación, necesitan estar conectados por calle a las casas, dentro de su radio de cobertura."
+    InfraCategory.PARK -> "Plazas y parques mejoran la puntuación verde de tu ciudad. Cuantas más casas tengas, más parques conviene construir: lo ideal es 1 parque por cada 4 casas."
+    InfraCategory.WATER -> "Torres de agua y plantas potabilizadoras dan cobertura de agua potable a las casas conectadas por calle, dentro de su radio de alcance."
+    InfraCategory.TRANSPORT -> "Paradas de autobús y estaciones de tren refuerzan la movilidad de las casas cercanas, como complemento a la red de calles."
+}
+
 /** Icono de infraestructura concreta a partir de su código de catálogo. */
 fun infraIconRes(code: String): Int = when (code) {
     "ROAD_BASIC" -> R.drawable.ic_infra_road

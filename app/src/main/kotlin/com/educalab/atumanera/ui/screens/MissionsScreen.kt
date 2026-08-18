@@ -96,20 +96,6 @@ fun MissionsScreen(viewModel: MissionsViewModel, onBack: () -> Unit) {
             }
             Spacer(Modifier.size(8.dp))
             LazyColumn(contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(10.dp)) {
-                if (pending.isEmpty() && state.items.isNotEmpty()) {
-                    item {
-                        Text(
-                            "¡Completaste todas las misiones disponibles! Sigue construyendo para desbloquear más.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(vertical = 12.dp)
-                        )
-                    }
-                }
-                items(pending, key = { it.mission.id }) { item ->
-                    MissionRow(item)
-                }
-
                 if (completed.isNotEmpty()) {
                     item {
                         Row(
@@ -138,6 +124,20 @@ fun MissionsScreen(viewModel: MissionsViewModel, onBack: () -> Unit) {
                             MissionRow(item)
                         }
                     }
+                }
+
+                if (pending.isEmpty() && state.items.isNotEmpty()) {
+                    item {
+                        Text(
+                            "¡Completaste todas las misiones disponibles! Sigue construyendo para desbloquear más.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+                    }
+                }
+                items(pending, key = { it.mission.id }) { item ->
+                    MissionRow(item)
                 }
             }
         }

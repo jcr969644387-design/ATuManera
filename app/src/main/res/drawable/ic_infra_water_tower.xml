@@ -3,8 +3,18 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#3AA6D6" android:pathData="M54.0,-5.200000000000003 L32.0,38.8 L54.0,54.2 L76.0,38.8 Z"/>
-    <path android:fillColor="#7C8894" android:pathData="M30,66 L38,66 L38,92 L30,92 Z"/>
-    <path android:fillColor="#7C8894" android:pathData="M70,66 L78,66 L78,92 L70,92 Z"/>
-    <path android:fillColor="#5B7482" android:pathData="M24,60 L84,60 L84,70 L24,70 Z"/>
+    <!-- Patas de soporte -->
+    <path android:fillColor="#7C8894" android:pathData="M38,50 L44,50 L32,92 L26,92 Z"/>
+    <path android:fillColor="#7C8894" android:pathData="M70,50 L76,50 L82,92 L76,92 Z"/>
+    <path android:fillColor="#5B7482" android:pathData="M31,72 L83,72 L83,78 L31,78 Z"/>
+    <!-- Escalerilla -->
+    <path android:fillColor="#5B7482" android:pathData="M52,50 L56,50 L56,92 L52,92 Z"/>
+    <path android:fillColor="#3A4650" android:pathData="M46,58 L62,58 L62,60 L46,60 Z"/>
+    <path android:fillColor="#3A4650" android:pathData="M46,68 L62,68 L62,70 L46,70 Z"/>
+    <path android:fillColor="#3A4650" android:pathData="M46,78 L62,78 L62,80 L46,80 Z"/>
+    <!-- Tanque -->
+    <path android:fillColor="#3AA6D6" android:pathData="M26,16 L82,16 Q88,16 88,22 L88,44 Q88,50 82,50 L26,50 Q20,50 20,44 L20,22 Q20,16 26,16 Z"/>
+    <path android:fillColor="#1F7FA8" android:pathData="M20,22 L88,22 L88,28 L20,28 Z"/>
+    <!-- Gota decorativa -->
+    <path android:fillColor="#FFFFFF" android:pathData="M54,30 L61,42 A7,7 0 1,1 47,42 Z"/>
 </vector>

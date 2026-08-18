@@ -3,8 +3,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#3A4650" android:pathData="M16,34 L92,34 Q98,34 98,40 L98,68 Q98,74 92,74 L16,74 Q10,74 10,68 L10,40 Q10,34 16,34 Z"/>
-    <path android:fillColor="#F4D35E" android:pathData="M24,50 L38,50 L38,58 L24,58 Z"/>
-    <path android:fillColor="#F4D35E" android:pathData="M50,50 L64,50 L64,58 L50,58 Z"/>
-    <path android:fillColor="#F4D35E" android:pathData="M76,50 L90,50 L90,58 L76,58 Z"/>
+    <!-- Acera superior -->
+    <path android:fillColor="#C9CFD3" android:pathData="M8,20 L100,20 L100,30 L8,30 Z"/>
+    <!-- Asfalto -->
+    <path android:fillColor="#3A4650" android:pathData="M8,30 L100,30 L100,78 L8,78 Z"/>
+    <!-- Acera inferior -->
+    <path android:fillColor="#C9CFD3" android:pathData="M8,78 L100,78 L100,88 L8,88 Z"/>
+    <!-- Línea central discontinua -->
+    <path android:fillColor="#F4D35E" android:pathData="M14,50 L28,50 L28,58 L14,58 Z"/>
+    <path android:fillColor="#F4D35E" android:pathData="M40,50 L54,50 L54,58 L40,58 Z"/>
+    <path android:fillColor="#F4D35E" android:pathData="M66,50 L80,50 L80,58 L66,58 Z"/>
+    <!-- Arbolito de esquina -->
+    <path android:fillColor="#7C4A3D" android:pathData="M86,10 L90,10 L90,18 L86,18 Z"/>
+    <path android:fillColor="#57B15F" android:pathData="M79,2 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0 Z"/>
 </vector>

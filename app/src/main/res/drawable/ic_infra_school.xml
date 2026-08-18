@@ -3,7 +3,25 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#8B6FE0" android:pathData="M54.0,16 L92,46 L16,46 Z"/>
-    <path android:fillColor="#A48CEA" android:pathData="M26,46 L82,46 L82,90 L26,90 Z"/>
-    <path android:fillColor="#4B2E83" android:pathData="M48,66 L60,66 L60,90 L48,90 Z"/>
+    <!-- Mástil y bandera -->
+    <path android:fillColor="#7C4A3D" android:pathData="M53,6 L55,6 L55,20 L53,20 Z"/>
+    <path android:fillColor="#F6A623" android:pathData="M55,6 L68,10 L55,14 Z"/>
+    <!-- Techo -->
+    <path android:fillColor="#8B6FE0" android:pathData="M54,16 L92,48 L16,48 Z"/>
+    <!-- Paredes -->
+    <path android:fillColor="#A48CEA" android:pathData="M26,48 L82,48 L82,92 L26,92 Z"/>
+    <!-- Ventanas -->
+    <path android:fillColor="#FFF3E4" android:pathData="M32,56 L44,56 L44,68 L32,68 Z"/>
+    <path android:fillColor="#8B6FE0" android:pathData="M37,56 L39,56 L39,68 L37,68 Z"/>
+    <path android:fillColor="#8B6FE0" android:pathData="M32,61 L44,61 L44,63 L32,63 Z"/>
+    <path android:fillColor="#FFF3E4" android:pathData="M64,56 L76,56 L76,68 L64,68 Z"/>
+    <path android:fillColor="#8B6FE0" android:pathData="M69,56 L71,56 L71,68 L69,68 Z"/>
+    <path android:fillColor="#8B6FE0" android:pathData="M64,61 L76,61 L76,63 L64,63 Z"/>
+    <!-- Puerta con arco -->
+    <path android:fillColor="#4B2E83" android:pathData="M48,66 L60,66 L60,92 L48,92 Z"/>
+    <path android:fillColor="#4B2E83" android:pathData="M48,66 A6,7 0 0,1 60,66 Z"/>
+    <!-- Cartel de colores -->
+    <path android:fillColor="#EF6F6C" android:pathData="M30,76 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z"/>
+    <path android:fillColor="#F6A623" android:pathData="M36,76 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z"/>
+    <path android:fillColor="#57B15F" android:pathData="M42,76 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z"/>
 </vector>

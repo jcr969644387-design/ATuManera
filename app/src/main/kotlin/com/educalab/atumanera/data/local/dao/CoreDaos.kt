@@ -106,6 +106,15 @@ interface PlacedInfrastructureDao {
     @Query("DELETE FROM placed_infrastructure WHERE cityId = :cityId")
     suspend fun clearCity(cityId: Long)
 
+    @Query(
+        """
+        DELETE FROM placed_infrastructure
+        WHERE cityId = :cityId AND infrastructureTypeId IN
+            (SELECT id FROM infrastructure_type WHERE category = :category)
+        """
+    )
+    suspend fun clearCategory(cityId: Long, category: String)
+
     @Query("SELECT * FROM placed_infrastructure WHERE cityId = :cityId")
     fun observeForCity(cityId: Long): Flow<List<PlacedInfrastructureEntity>>
 

@@ -3,7 +3,19 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#E0554F" android:pathData="M26,16 L82,16 Q92,16 92,26 L92,82 Q92,92 82,92 L26,92 Q16,92 16,82 L16,26 Q16,16 26,16 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M46,30 L62,30 L62,78 L46,78 Z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M30,46 L78,46 L78,62 L30,62 Z"/>
+    <!-- Paredes -->
+    <path android:fillColor="#FCE3E1" android:pathData="M20,40 L88,40 L88,92 L20,92 Z"/>
+    <!-- Toldo -->
+    <path android:fillColor="#E0554F" android:pathData="M14,32 L94,32 Q98,32 98,36 L98,44 L10,44 L10,36 Q10,32 14,32 Z"/>
+    <!-- Cruz en círculo -->
+    <path android:fillColor="#FFFFFF" android:pathData="M40,10 a14,14 0 1,0 28,0 a14,14 0 1,0 -28,0 Z"/>
+    <path android:fillColor="#E0554F" android:pathData="M50,2 L58,2 L58,18 L50,18 Z"/>
+    <path android:fillColor="#E0554F" android:pathData="M46,6 L62,6 L62,14 L46,14 Z"/>
+    <!-- Ventanas -->
+    <path android:fillColor="#BFE6F5" android:pathData="M28,50 L42,50 L42,64 L28,64 Z"/>
+    <path android:fillColor="#BFE6F5" android:pathData="M66,50 L80,50 L80,64 L66,64 Z"/>
+    <!-- Puerta -->
+    <path android:fillColor="#FFFFFF" android:pathData="M46,68 L62,68 L62,92 L46,92 Z"/>
+    <path android:fillColor="#E0554F" android:pathData="M52,74 L56,74 L56,86 L52,86 Z"/>
+    <path android:fillColor="#E0554F" android:pathData="M48,78 L60,78 L60,82 L48,82 Z"/>
 </vector>
