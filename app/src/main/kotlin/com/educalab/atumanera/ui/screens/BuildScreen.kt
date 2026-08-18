@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -228,28 +229,33 @@ fun BuildScreen(
                     }
                 }
 
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(catalogForCategory) { infra ->
-                        InfraOptionCard(
-                            infra = infra,
-                            selected = infra.id == selectedInfraId,
-                            color = visual.color,
-                            showPrice = !freeMode,
-                            onClick = { selectedInfraId = infra.id }
+                // En Modo Libre se oculta la tarjeta de selección (imagen +
+                // nombre + descripción) para dejar más espacio al mapa: la
+                // categoría ya elegida arriba basta, y se construye con la
+                // primera opción de esa categoría automáticamente.
+                if (!freeMode) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+                    ) {
+                        items(catalogForCategory) { infra ->
+                            InfraOptionCard(
+                                infra = infra,
+                                selected = infra.id == selectedInfraId,
+                                color = visual.color,
+                                onClick = { selectedInfraId = infra.id }
+                            )
+                        }
+                    }
+
+                    if (selectedInfra != null) {
+                        Text(
+                            selectedInfra.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                         )
                     }
-                }
-
-                if (selectedInfra != null) {
-                    Text(
-                        selectedInfra.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                    )
                 }
 
                 if (state.isReady && state.city != null) {
@@ -301,6 +307,7 @@ fun BuildScreen(
                             .heightIn(max = 420.dp)
                             .padding(horizontal = 16.dp)
                             .horizontalScroll(rememberScrollState())
+                            .verticalScroll(rememberScrollState())
                     ) {
                         CityGridCanvas(
                             tiles = state.tiles,

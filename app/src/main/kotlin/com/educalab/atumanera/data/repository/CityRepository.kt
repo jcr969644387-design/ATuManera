@@ -25,6 +25,8 @@ import com.educalab.atumanera.domain.model.GridPosition
 import com.educalab.atumanera.domain.model.InfraCategory
 import com.educalab.atumanera.domain.model.RequirementType
 import com.educalab.atumanera.domain.model.TileSnapshot
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /** Resultado de intentar colocar una infraestructura sobre la cuadrícula. */
 sealed class PlacementOutcome {
@@ -54,6 +56,12 @@ class CityRepository(private val db: AppDatabase) {
     private val budgetManager = BudgetManager()
     private val missionEvaluator = MissionEvaluator()
     private val unlockEvaluator = UnlockEvaluator()
+
+    // Serializa finalizeCityUpdate: si dos construcciones se disparan casi a
+    // la vez, sin esto podían pisarse al leer-modificar-escribir el progreso
+    // compartido (misiones completadas, XP y nivel), causando conteos
+    // desincronizados como "25/67" arriba pero "27" en la lista real.
+    private val finalizeMutex = Mutex()
 
     companion object {
         // Rangos de orderIndex que definen cada nivel de dificultad de misiones.
@@ -275,7 +283,7 @@ class CityRepository(private val db: AppDatabase) {
 
     // ---------- Recalculo integral tras cada cambio ----------
 
-    private suspend fun finalizeCityUpdate(userId: Long, cityId: Long): PlacementOutcome.Success {
+    private suspend fun finalizeCityUpdate(userId: Long, cityId: Long): PlacementOutcome.Success = finalizeMutex.withLock {
         val city = db.cityDao().getById(cityId)!!
         val engine = GridEngine(city.rows, city.cols)
         val calculator = MetricsCalculator(engine)
@@ -322,8 +330,6 @@ class CityRepository(private val db: AppDatabase) {
         )
 
         val progress = db.progressDao().getForUser(userId) ?: ProgressEntity(0, userId, cityId, 1, 0, 0, System.currentTimeMillis())
-        var totalXp = progress.totalXp
-        var missionsCompleted = progress.missionsCompleted
         val newlyCompleted = mutableListOf<String>()
         val completedMissionIds = mutableSetOf<Long>()
 
@@ -364,8 +370,6 @@ class CityRepository(private val db: AppDatabase) {
                     db.missionProgressDao().upsert(
                         MissionProgressEntity(0, userId, cityId, mission.id, "COMPLETED", 100, System.currentTimeMillis())
                     )
-                    totalXp += mission.rewardXp
-                    missionsCompleted += 1
                     newlyCompleted.add(mission.code)
                     completedMissionIds.add(mission.id)
                 } else {
@@ -378,6 +382,13 @@ class CityRepository(private val db: AppDatabase) {
 
             previousLevelUnlocked = missionsInLevel.isNotEmpty() && missionsInLevel.all { it.id in completedMissionIds }
         }
+
+        // XP y misiones completadas se recalculan siempre desde la lista real
+        // de misiones completadas (en vez de acumular un contador guardado),
+        // para que nunca se desincronicen del progreso real.
+        val missionById = allMissions.associateBy { it.id }
+        val missionsCompleted = completedMissionIds.size
+        val totalXp = completedMissionIds.sumOf { missionById[it]?.rewardXp ?: 0 }
 
         // Al completar cada nivel de misiones por completo se libera presupuesto
         // adicional para poder afrontar el siguiente nivel, más exigente.
