@@ -137,12 +137,7 @@ fun BuildScreen(
                 ScreenTopBar(
                     title = visual.label,
                     subtitle = "Elige un módulo y toca una casilla libre para construir",
-                    onBack = onBack,
-                    trailing = {
-                        IconButton(onClick = { confirmClearAll = true }) {
-                            Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar todas las construcciones")
-                        }
-                    }
+                    onBack = onBack
                 )
 
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -210,6 +205,9 @@ fun BuildScreen(
                         }
                         IconButton(onClick = { zoom = (zoom + ZOOM_STEP).coerceAtMost(ZOOM_MAX) }, enabled = zoom < ZOOM_MAX) {
                             Icon(Icons.Filled.ZoomIn, contentDescription = "Acercar mapa")
+                        }
+                        IconButton(onClick = { confirmClearAll = true }) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar todas las construcciones")
                         }
                     }
 
