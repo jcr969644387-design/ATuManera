@@ -67,7 +67,7 @@ class CityRepositoryTest {
         seeder.seedCatalogIfNeeded()
         seeder.seedCatalogIfNeeded()
         assertEquals(13, db.infrastructureTypeDao().count())
-        assertEquals(30, db.missionDao().count())
+        assertEquals(67, db.missionDao().count())
         assertEquals(12, db.badgeDao().count())
         assertEquals(8, db.decorationDao().count())
     }
