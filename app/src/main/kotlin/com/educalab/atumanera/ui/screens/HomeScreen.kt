@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -98,8 +99,28 @@ fun HomeScreen(
                     val spent = state.latestMetric?.budgetSpent ?: 0
                     val total = state.city?.budgetTotal ?: 0
                     StatPill("Presupuesto", "${(total - spent).coerceAtLeast(0)} / $total", SunAmber, Modifier.weight(1f))
-                    StatPill("Movilidad", "${state.latestMetric?.mobility ?: 0}%", BlueprintBlue, Modifier.weight(1f))
-                    StatPill("Servicios", "${state.latestMetric?.servicesScore ?: 0}%", com.educalab.atumanera.ui.theme.GrassGreen, Modifier.weight(1f))
+                }
+            }
+            item {
+                val metric = state.latestMetric
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxWidth().height(140.dp).padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        listOf(
+                            Triple("Movilidad", metric?.mobility ?: 0, BlueprintBlue),
+                            Triple("Servicios", metric?.servicesScore ?: 0, com.educalab.atumanera.ui.theme.GrassGreen),
+                            Triple("Áreas verdes", metric?.greenScore ?: 0, com.educalab.atumanera.ui.theme.GrassGreen),
+                            Triple("Educación", metric?.educationCoverage ?: 0, com.educalab.atumanera.ui.theme.EducationViolet),
+                            Triple("Salud", metric?.healthCoverage ?: 0, com.educalab.atumanera.ui.theme.HealthRed),
+                            Triple("Agua", metric?.waterCoverage ?: 0, com.educalab.atumanera.ui.theme.WaterBlue)
+                        )
+                    ) { (label, value, color) ->
+                        StatPill(label, "$value%", color, Modifier.fillMaxWidth())
+                    }
                 }
             }
 
@@ -199,7 +220,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    HomeShortcutCard("Misiones", "${missionsState.missionsCompleted}/30 completadas", Modifier.weight(1f), onOpenMissions)
+                    HomeShortcutCard("Misiones", "${missionsState.missionsCompleted}/${missionsState.items.size} completadas", Modifier.weight(1f), onOpenMissions)
                     HomeShortcutCard("Indicadores", "Progreso y colección", Modifier.weight(1f), onOpenIndicators)
                 }
             }
@@ -232,6 +253,7 @@ private fun HomeHeader(aliasName: String, avatarCode: String, onSettings: () -> 
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
+            .displayCutoutPadding()
             .background(BlueprintBlue)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically

@@ -48,6 +48,20 @@ class CityRepository(private val db: AppDatabase) {
     private val missionEvaluator = MissionEvaluator()
     private val unlockEvaluator = UnlockEvaluator()
 
+    companion object {
+        // Rangos de orderIndex que definen cada nivel de dificultad de misiones.
+        private val LEVEL_1_RANGE = 1..30
+        private val LEVEL_2_RANGE = 31..48
+        private val LEVEL_3_RANGE = 49..59
+        private val LEVEL_4_RANGE = 60..67
+
+        // Presupuesto adicional que se desbloquea al completar cada nivel por completo.
+        private const val LEVEL_1_BUDGET_BONUS = 2000
+        private const val LEVEL_2_BUDGET_BONUS = 3000
+        private const val LEVEL_3_BUDGET_BONUS = 4500
+        private const val LEVEL_4_BUDGET_BONUS = 6000
+    }
+
     // ---------- Lectura de estado ----------
 
     suspend fun buildGridSnapshot(cityId: Long): List<TileSnapshot> {
@@ -220,6 +234,7 @@ class CityRepository(private val db: AppDatabase) {
         var totalXp = progress.totalXp
         var missionsCompleted = progress.missionsCompleted
         val newlyCompleted = mutableListOf<String>()
+        val completedMissionIds = mutableSetOf<Long>()
 
         val allMissions = db.missionDao().getAllList()
         for (mission in allMissions) {
@@ -237,16 +252,50 @@ class CityRepository(private val db: AppDatabase) {
                 totalXp += mission.rewardXp
                 missionsCompleted += 1
                 newlyCompleted.add(mission.code)
+                completedMissionIds.add(mission.id)
             } else if (!alreadyCompleted) {
                 val status = if (evaluation.progressPercent > 0) "IN_PROGRESS" else "AVAILABLE"
                 db.missionProgressDao().upsert(
                     MissionProgressEntity(0, userId, cityId, mission.id, status, evaluation.progressPercent, null)
                 )
+            } else {
+                completedMissionIds.add(mission.id)
             }
         }
 
+        // Al completar cada nivel de misiones por completo se libera presupuesto
+        // adicional para poder afrontar el siguiente nivel, más exigente.
+        // progress.currentChapter guarda el próximo nivel pendiente de recompensar
+        // (1 = aún no se recompensó el nivel 1) para no otorgar el bono dos veces.
+        fun levelComplete(range: IntRange): Boolean {
+            val idsInLevel = allMissions.filter { it.orderIndex in range }.map { it.id }
+            return idsInLevel.isNotEmpty() && idsInLevel.all { it in completedMissionIds }
+        }
+
+        var currentChapter = progress.currentChapter
+        var budgetTotal = city.budgetTotal
+        if (currentChapter <= 1 && levelComplete(LEVEL_1_RANGE)) {
+            budgetTotal += LEVEL_1_BUDGET_BONUS
+            currentChapter = 2
+        }
+        if (currentChapter <= 2 && levelComplete(LEVEL_2_RANGE)) {
+            budgetTotal += LEVEL_2_BUDGET_BONUS
+            currentChapter = 3
+        }
+        if (currentChapter <= 3 && levelComplete(LEVEL_3_RANGE)) {
+            budgetTotal += LEVEL_3_BUDGET_BONUS
+            currentChapter = 4
+        }
+        if (currentChapter <= 4 && levelComplete(LEVEL_4_RANGE)) {
+            budgetTotal += LEVEL_4_BUDGET_BONUS
+            currentChapter = 5
+        }
+        if (budgetTotal != city.budgetTotal) {
+            db.cityDao().update(city.copy(budgetTotal = budgetTotal, updatedAt = System.currentTimeMillis()))
+        }
+
         db.progressDao().upsert(
-            progress.copy(userId = userId, cityId = cityId, totalXp = totalXp, missionsCompleted = missionsCompleted, updatedAt = System.currentTimeMillis())
+            progress.copy(userId = userId, cityId = cityId, currentChapter = currentChapter, totalXp = totalXp, missionsCompleted = missionsCompleted, updatedAt = System.currentTimeMillis())
         )
 
         // Evaluar insignias y decoraciones desbloqueables.

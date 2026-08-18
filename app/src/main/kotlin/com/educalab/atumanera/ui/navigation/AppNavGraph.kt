@@ -83,8 +83,10 @@ fun AppNavGraph(
             BuildScreen(
                 category = InfraCategory.valueOf(categoryName),
                 viewModel = cityViewModel,
+                missionsViewModel = missionsViewModel,
                 preferences = preferences,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onOpenMissions = { navController.navigate(Routes.MISSIONS) }
             )
         }
         composable(Routes.MISSIONS) {

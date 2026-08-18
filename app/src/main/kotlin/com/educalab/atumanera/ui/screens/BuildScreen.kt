@@ -55,8 +55,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.educalab.atumanera.data.local.entity.InfrastructureTypeEntity
 import com.educalab.atumanera.domain.model.InfraCategory
+import com.educalab.atumanera.domain.model.MissionStatus
 import com.educalab.atumanera.ui.CityEvent
 import com.educalab.atumanera.ui.CityViewModel
+import com.educalab.atumanera.ui.MissionsViewModel
+import com.educalab.atumanera.ui.components.AnimatedProgressBar
 import com.educalab.atumanera.ui.components.CityGridCanvas
 import com.educalab.atumanera.ui.components.ScreenTopBar
 import com.educalab.atumanera.ui.components.StatPill
@@ -83,10 +86,14 @@ private fun categoryTip(category: InfraCategory): String = when (category) {
 fun BuildScreen(
     category: InfraCategory,
     viewModel: CityViewModel,
+    missionsViewModel: MissionsViewModel,
     preferences: AppPreferences,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onOpenMissions: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val missionsState by missionsViewModel.state.collectAsState()
+    val nextMission = missionsState.items.firstOrNull { it.status == MissionStatus.AVAILABLE || it.status == MissionStatus.IN_PROGRESS }
     var currentCategory by remember { mutableStateOf(category) }
     val visual = categoryVisual(currentCategory)
     val context = LocalContext.current
@@ -145,6 +152,32 @@ fun BuildScreen(
                     val spent = state.latestMetric?.budgetSpent ?: 0
                     val total = state.city?.budgetTotal ?: 0
                     StatPill("Presupuesto disponible", "${(total - spent).coerceAtLeast(0)}", visual.color, Modifier.weight(1f))
+                }
+
+                if (nextMission != null) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clickable { onOpenMissions() },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = painterResource(com.educalab.atumanera.R.drawable.mascot_guide),
+                                contentDescription = null,
+                                modifier = Modifier.size(36.dp)
+                            )
+                            Spacer(Modifier.size(10.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text("Misión pendiente", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(nextMission.mission.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.size(4.dp))
+                                AnimatedProgressBar(progress = nextMission.progressPercent / 100f, modifier = Modifier.fillMaxWidth())
+                            }
+                        }
+                    }
                 }
 
                 LazyRow(

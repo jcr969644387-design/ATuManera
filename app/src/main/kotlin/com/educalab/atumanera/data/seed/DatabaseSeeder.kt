@@ -14,8 +14,8 @@ const val DEFAULT_CITY_BUDGET = 2500
 
 /**
  * Puebla la base de datos en el primer arranque: catálogo de infraestructuras,
- * insignias, decoraciones y las 30 misiones. También crea el perfil, la
- * ciudad y la cuadrícula inicial si todavía no existen.
+ * insignias, decoraciones y las misiones (4 niveles de dificultad). También
+ * crea el perfil, la ciudad y la cuadrícula inicial si todavía no existen.
  */
 class DatabaseSeeder(private val db: AppDatabase) {
 
@@ -29,19 +29,20 @@ class DatabaseSeeder(private val db: AppDatabase) {
         if (db.decorationDao().count() == 0) {
             db.decorationDao().insertAll(CatalogSeed.decorations())
         }
-        if (db.missionDao().count() == 0) {
-            val missionSeeds = MissionSeed.missions()
-            for (seed in missionSeeds) {
-                val missionId = db.missionDao().insert(
-                    MissionEntity(0, seed.code, seed.title, seed.description, seed.category, seed.order, seed.rewardXp, seed.rewardBadgeCode)
+        // Se inserta cada misión por su código único, no solo en el primer
+        // arranque: así, cuando se agregan misiones nuevas en una
+        // actualización, también aparecen en instalaciones ya existentes.
+        for (seed in MissionSeed.missions()) {
+            if (db.missionDao().getByCode(seed.code) != null) continue
+            val missionId = db.missionDao().insert(
+                MissionEntity(0, seed.code, seed.title, seed.description, seed.category, seed.order, seed.rewardXp, seed.rewardBadgeCode)
+            )
+            if (seed.requirements.isNotEmpty()) {
+                db.missionRequirementDao().insertAll(
+                    seed.requirements.map { req ->
+                        MissionRequirementEntity(0, missionId, req.type.name, req.key, req.target)
+                    }
                 )
-                if (seed.requirements.isNotEmpty()) {
-                    db.missionRequirementDao().insertAll(
-                        seed.requirements.map { req ->
-                            MissionRequirementEntity(0, missionId, req.type.name, req.key, req.target)
-                        }
-                    )
-                }
             }
         }
     }
