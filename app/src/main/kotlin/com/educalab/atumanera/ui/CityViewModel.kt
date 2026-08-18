@@ -152,6 +152,34 @@ class CityViewModel(
         }
     }
 
+    /** Construye una línea recta de casillas (misma fila o misma columna). Solo aplica en Modo Libre. */
+    fun placeLine(rowStart: Int, colStart: Int, rowEnd: Int, colEnd: Int, infrastructureTypeId: Long?) {
+        if (!freeMode || infrastructureTypeId == null) return
+        val city = state.value.city ?: return
+        val positions = when {
+            rowStart == rowEnd -> (minOf(colStart, colEnd)..maxOf(colStart, colEnd)).map { rowStart to it }
+            colStart == colEnd -> (minOf(rowStart, rowEnd)..maxOf(rowStart, rowEnd)).map { it to colStart }
+            else -> emptyList()
+        }
+        if (positions.isEmpty()) return
+        viewModelScope.launch {
+            for ((r, c) in positions) {
+                repository.placeInfrastructureFree(city.id, r, c, infrastructureTypeId)
+            }
+            _events.tryEmit(CityEvent.Placed)
+        }
+    }
+
+    /** Cambia el tamaño (cuadrado) de la cuadrícula. Solo aplica en Modo Libre. */
+    fun resizeFreeGrid(newSize: Int) {
+        if (!freeMode) return
+        val city = state.value.city ?: return
+        val clamped = newSize.coerceIn(5, 20)
+        viewModelScope.launch {
+            repository.resizeFreeCity(city.id, clamped, clamped)
+        }
+    }
+
     fun clearCategory(category: InfraCategory) {
         val u = state.value.user ?: return
         val city = state.value.city ?: return

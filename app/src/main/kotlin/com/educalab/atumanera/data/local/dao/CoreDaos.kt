@@ -78,6 +78,10 @@ interface CityTileDao {
 
     @Query("SELECT COUNT(*) FROM city_tile WHERE cityId = :cityId")
     suspend fun countForCity(cityId: Long): Int
+
+    /** Elimina las casillas fuera de las nuevas dimensiones (para achicar la cuadrícula). */
+    @Query("DELETE FROM city_tile WHERE cityId = :cityId AND (row >= :maxRows OR col >= :maxCols)")
+    suspend fun trimToBounds(cityId: Long, maxRows: Int, maxCols: Int)
 }
 
 @Dao

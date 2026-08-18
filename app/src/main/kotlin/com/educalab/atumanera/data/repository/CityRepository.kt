@@ -237,6 +237,25 @@ class CityRepository(private val db: AppDatabase) {
         return PlacementOutcome.Success(currentMetrics(cityId), emptyList(), emptyList())
     }
 
+    /** Cambia el tamaño de la cuadrícula de Modo Libre, agregando o quitando casillas de los bordes. */
+    suspend fun resizeFreeCity(cityId: Long, newRows: Int, newCols: Int) {
+        val city = db.cityDao().getById(cityId) ?: return
+        if (newRows < city.rows || newCols < city.cols) {
+            db.cityTileDao().trimToBounds(cityId, newRows, newCols)
+        }
+        if (newRows > city.rows || newCols > city.cols) {
+            val existing = db.cityTileDao().getTilesForCity(cityId).map { it.row to it.col }.toSet()
+            val newTiles = mutableListOf<CityTileEntity>()
+            for (r in 0 until newRows) {
+                for (c in 0 until newCols) {
+                    if ((r to c) !in existing) newTiles.add(CityTileEntity(0, cityId, r, c, true))
+                }
+            }
+            if (newTiles.isNotEmpty()) db.cityTileDao().insertAll(newTiles)
+        }
+        db.cityDao().update(city.copy(rows = newRows, cols = newCols, updatedAt = System.currentTimeMillis()))
+    }
+
     private suspend fun linkRoadNeighbors(rows: Int, cols: Int, cityId: Long, tileId: Long, row: Int, col: Int) {
         val neighborOffsets = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         val connections = mutableListOf<RoadConnectionEntity>()

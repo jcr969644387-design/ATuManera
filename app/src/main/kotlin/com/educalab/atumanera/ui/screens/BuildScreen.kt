@@ -22,8 +22,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material.icons.filled.ZoomOut
@@ -211,12 +213,16 @@ fun BuildScreen(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Elige qué construir",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f)
-                    )
+                    if (!freeMode) {
+                        Text(
+                            "Elige qué construir",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        Spacer(Modifier.weight(1f))
+                    }
                     IconButton(onClick = { confirmClearCategory = true }) {
                         Icon(Icons.Filled.DeleteSweep, contentDescription = "Eliminar solo ${visual.label}")
                     }
@@ -231,6 +237,7 @@ fun BuildScreen(
                             infra = infra,
                             selected = infra.id == selectedInfraId,
                             color = visual.color,
+                            showPrice = !freeMode,
                             onClick = { selectedInfraId = infra.id }
                         )
                     }
@@ -267,6 +274,27 @@ fun BuildScreen(
                         }
                     }
 
+                    if (freeMode) {
+                        val gridSize = state.city!!.rows
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Tamaño del mapa: $gridSize x $gridSize",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(onClick = { viewModel.resizeFreeGrid(gridSize - 1) }, enabled = gridSize > 5) {
+                                Icon(Icons.Filled.Remove, contentDescription = "Achicar el mapa")
+                            }
+                            IconButton(onClick = { viewModel.resizeFreeGrid(gridSize + 1) }, enabled = gridSize < 20) {
+                                Icon(Icons.Filled.Add, contentDescription = "Agrandar el mapa")
+                            }
+                        }
+                    }
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -288,17 +316,24 @@ fun BuildScreen(
                                     val infraId = selectedInfraId
                                     if (infraId != null) viewModel.place(row, col, infraId)
                                 }
-                            }
+                            },
+                            onLineDrag = if (freeMode) {
+                                { rowStart: Int, colStart: Int, rowEnd: Int, colEnd: Int ->
+                                    selectedInfraId?.let { infraId -> viewModel.placeLine(rowStart, colStart, rowEnd, colEnd, infraId) }
+                                }
+                            } else null
                         )
                     }
                 }
 
-                Text(
-                    categoryTip(currentCategory),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(16.dp)
-                )
+                if (!freeMode) {
+                    Text(
+                        categoryTip(currentCategory),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             }
 
             feedback?.let { msg ->
@@ -428,7 +463,7 @@ private fun CategoryChip(category: InfraCategory, selected: Boolean, onClick: ()
 }
 
 @Composable
-private fun InfraOptionCard(infra: InfrastructureTypeEntity, selected: Boolean, color: Color, onClick: () -> Unit) {
+private fun InfraOptionCard(infra: InfrastructureTypeEntity, selected: Boolean, color: Color, showPrice: Boolean = true, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(140.dp)
@@ -441,7 +476,9 @@ private fun InfraOptionCard(infra: InfrastructureTypeEntity, selected: Boolean, 
             Image(painter = painterResource(infraIconRes(infra.code)), contentDescription = infra.name, modifier = Modifier.size(52.dp))
             Spacer(Modifier.size(4.dp))
             Text(infra.name, style = MaterialTheme.typography.labelLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
-            Text("${infra.cost} monedas", style = MaterialTheme.typography.labelMedium, color = color, fontWeight = FontWeight.Bold)
+            if (showPrice) {
+                Text("${infra.cost} monedas", style = MaterialTheme.typography.labelMedium, color = color, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
