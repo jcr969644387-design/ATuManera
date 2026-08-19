@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,8 +30,6 @@ import androidx.compose.ui.res.painterResource
 import com.educalab.atumanera.domain.model.InfraCategory
 import com.educalab.atumanera.ui.TileVisual
 import kotlin.math.floor
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 private val GRASS_A = Color(0xFFBFE6A0)
 private val GRASS_B = Color(0xFFAEDB8C)
@@ -56,8 +53,6 @@ private fun Color.lighten(factor: Float): Color = Color(
  * césped y, si tiene una construcción, se dibuja un pequeño bloque en 3D con
  * caras laterales sombreadas (las calles quedan planas, como pavimento, para
  * que se vean conectadas entre sí). Los toques se traducen a fila/columna.
- * Si se provee [onLineDrag], además de tocar una casilla se puede arrastrar
- * en línea recta para construir varias casillas seguidas (solo Modo Libre).
  */
 @Composable
 fun CityGridCanvas(
@@ -66,13 +61,11 @@ fun CityGridCanvas(
     cols: Int,
     modifier: Modifier = Modifier,
     highlightCategory: InfraCategory? = null,
-    onTileTap: (row: Int, col: Int) -> Unit,
-    onLineDrag: ((rowStart: Int, colStart: Int, rowEnd: Int, colEnd: Int) -> Unit)? = null
+    onTileTap: (row: Int, col: Int) -> Unit
 ) {
     val tileByPos = remember(tiles) { tiles.associateBy { it.tile.row to it.tile.col } }
     val density = LocalDensity.current
     val currentOnTileTap = rememberUpdatedState(onTileTap)
-    val currentOnLineDrag = rememberUpdatedState(onLineDrag)
 
     BoxWithConstraints(modifier = modifier) {
         val boardWidthPx = constraints.maxWidth.toFloat()
@@ -105,45 +98,10 @@ fun CityGridCanvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(with(density) { boardHeightPx.toDp() })
-                .pointerInput(rows, cols, tileW, tileH, onLineDrag != null) {
-                    // Se ejecutan dos detectores en paralelo: uno de toque
-                    // (para colocar una sola casilla, incluso si hay arrastre
-                    // activo) y, si corresponde, uno de arrastre en línea recta
-                    // (que solo actúa cuando el gesto supera el umbral de
-                    // movimiento; un toque simple nunca dispara el arrastre,
-                    // así que ambos conviven sin pisarse).
-                    coroutineScope {
-                        launch {
-                            detectTapGestures { tapOffset ->
-                                val (row, col) = resolveTile(tapOffset)
-                                if (row in 0 until rows && col in 0 until cols) currentOnTileTap.value(row, col)
-                            }
-                        }
-                        if (currentOnLineDrag.value != null) {
-                            launch {
-                                var startRow = -1
-                                var startCol = -1
-                                var lastRow = -1
-                                var lastCol = -1
-                                detectDragGestures(
-                                    onDragStart = { offset ->
-                                        val (r, c) = resolveTile(offset)
-                                        startRow = r; startCol = c; lastRow = r; lastCol = c
-                                    },
-                                    onDragEnd = {
-                                        if (startRow in 0 until rows && startCol in 0 until cols &&
-                                            lastRow in 0 until rows && lastCol in 0 until cols &&
-                                            !(startRow == lastRow && startCol == lastCol)
-                                        ) {
-                                            currentOnLineDrag.value?.invoke(startRow, startCol, lastRow, lastCol)
-                                        }
-                                    }
-                                ) { change, _ ->
-                                    val (r, c) = resolveTile(change.position)
-                                    lastRow = r; lastCol = c
-                                }
-                            }
-                        }
+                .pointerInput(rows, cols, tileW, tileH) {
+                    detectTapGestures { tapOffset ->
+                        val (row, col) = resolveTile(tapOffset)
+                        if (row in 0 until rows && col in 0 until cols) currentOnTileTap.value(row, col)
                     }
                 }
         ) {

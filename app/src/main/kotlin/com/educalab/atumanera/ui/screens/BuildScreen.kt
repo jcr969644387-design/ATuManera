@@ -211,31 +211,34 @@ fun BuildScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
+                // En Modo Libre se oculta esta sección entera (imagen, nombre y
+                // descripción) para dejar más espacio al mapa: la categoría ya
+                // elegida arriba basta y se construye con su primera opción.
+                // En el mapa de misiones, la etiqueta y las opciones van en una
+                // sola fila compacta para que el mapa quede más cerca arriba.
                 if (!freeMode) {
-                    Text(
-                        "Elige qué construir",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                }
-
-                // En Modo Libre se oculta la tarjeta de selección (imagen +
-                // nombre + descripción) para dejar más espacio al mapa: la
-                // categoría ya elegida arriba basta, y se construye con la
-                // primera opción de esa categoría automáticamente.
-                if (!freeMode) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(catalogForCategory) { infra ->
-                            InfraOptionCard(
-                                infra = infra,
-                                selected = infra.id == selectedInfraId,
-                                color = visual.color,
-                                onClick = { selectedInfraId = infra.id }
-                            )
+                        Text(
+                            "Elige qué construir",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(end = 16.dp)
+                        ) {
+                            items(catalogForCategory) { infra ->
+                                InfraOptionCard(
+                                    infra = infra,
+                                    selected = infra.id == selectedInfraId,
+                                    color = visual.color,
+                                    onClick = { selectedInfraId = infra.id }
+                                )
+                            }
                         }
                     }
 
@@ -327,12 +330,7 @@ fun BuildScreen(
                                     val infraId = selectedInfraId
                                     if (infraId != null) viewModel.place(row, col, infraId)
                                 }
-                            },
-                            onLineDrag = if (freeMode) {
-                                { rowStart: Int, colStart: Int, rowEnd: Int, colEnd: Int ->
-                                    selectedInfraId?.let { infraId -> viewModel.placeLine(rowStart, colStart, rowEnd, colEnd, infraId) }
-                                }
-                            } else null
+                            }
                         )
                     }
                 }
@@ -474,22 +472,25 @@ private fun CategoryChip(category: InfraCategory, selected: Boolean, onClick: ()
 }
 
 @Composable
-private fun InfraOptionCard(infra: InfrastructureTypeEntity, selected: Boolean, color: Color, showPrice: Boolean = true, onClick: () -> Unit) {
+private fun InfraOptionCard(infra: InfrastructureTypeEntity, selected: Boolean, color: Color, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .width(140.dp)
+            .width(84.dp)
             .clickable(onClick = onClick)
-            .border(width = if (selected) 3.dp else 0.dp, color = color, shape = RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
+            .border(width = if (selected) 2.5.dp else 0.dp, color = color, shape = RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(infraIconRes(infra.code)), contentDescription = infra.name, modifier = Modifier.size(52.dp))
-            Spacer(Modifier.size(4.dp))
-            Text(infra.name, style = MaterialTheme.typography.labelLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, maxLines = 2)
-            if (showPrice) {
-                Text("${infra.cost} monedas", style = MaterialTheme.typography.labelMedium, color = color, fontWeight = FontWeight.Bold)
-            }
+        Column(modifier = Modifier.padding(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(painter = painterResource(infraIconRes(infra.code)), contentDescription = infra.name, modifier = Modifier.size(34.dp))
+            Text(
+                infra.name,
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Text("${infra.cost}¢", style = MaterialTheme.typography.labelSmall, color = color, fontWeight = FontWeight.Bold, maxLines = 1)
         }
     }
 }
