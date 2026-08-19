@@ -211,45 +211,44 @@ fun BuildScreen(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                // En Modo Libre se oculta esta sección entera (imagen, nombre y
-                // descripción) para dejar más espacio al mapa: la categoría ya
-                // elegida arriba basta y se construye con su primera opción.
-                // En el mapa de misiones, la etiqueta y las opciones van en una
-                // sola fila compacta para que el mapa quede más cerca arriba.
-                if (!freeMode) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                // El selector va en una sola fila compacta (etiqueta + tarjetas
+                // chicas) en ambos modos, para que se pueda elegir entre las
+                // opciones de un módulo (por ejemplo Casa pequeña o Bloque)
+                // también en Modo Libre, sin ocupar mucho espacio del mapa.
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Elige qué construir",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(end = 16.dp)
                     ) {
-                        Text(
-                            "Elige qué construir",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        LazyRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(end = 16.dp)
-                        ) {
-                            items(catalogForCategory) { infra ->
-                                InfraOptionCard(
-                                    infra = infra,
-                                    selected = infra.id == selectedInfraId,
-                                    color = visual.color,
-                                    onClick = { selectedInfraId = infra.id }
-                                )
-                            }
+                        items(catalogForCategory) { infra ->
+                            InfraOptionCard(
+                                infra = infra,
+                                selected = infra.id == selectedInfraId,
+                                color = visual.color,
+                                onClick = { selectedInfraId = infra.id }
+                            )
                         }
                     }
+                }
 
-                    if (selectedInfra != null) {
-                        Text(
-                            selectedInfra.description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                        )
-                    }
+                // La descripción larga solo se muestra en el mapa de misiones;
+                // en Modo Libre se omite para dejar más espacio al mapa.
+                if (!freeMode && selectedInfra != null) {
+                    Text(
+                        selectedInfra.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
                 }
 
                 if (state.isReady && state.city != null) {
